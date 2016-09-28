@@ -72,9 +72,9 @@ $ sudo docker daemon --api-cors-header="*" -H tcp://0.0.0.0:2375 -H unix:///var/
 Pull necessary images, notice the default config require a local built `openblockchain/baseimage`. We can just use the `yeasy/hyperledger` image instead.
 
 ```sh
-$ docker pull yeasy/hyperledger:latest
-$ docker tag yeasy/hyperledger:latest hyperledger/fabric-baseimage:latest
-$ docker pull yeasy/hyperledger-fabric:latest
+$ docker pull yeasy/hyperledger-fabric:0.6-dp
+$ docker tag yeasy/hyperledger-fabric:0.6-dp hyperledger/fabric-baseimage:latest
+$ docker tag yeasy/hyperledger-fabric:0.6-dp hyperledger/fabric-peer:latest
 ```
 
 Check the `docker0` bridge ip, normally it should be `172.17.0.1`. This ip will be used as the `CORE_VM_ENDPOINT=http://172.17.0.1:2375`.
