@@ -140,32 +140,41 @@ Inside the container, deploy a chaincode using
 
 ```sh
 $ peer chaincode deploy -p github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02 -c '{"Function":"init", "Args": ["a","100", "b", "200"]}'
-13:16:35.643 [crypto] main -> INFO 001 Log level recognized 'info', set to INFO
-5844bc142dcc9e788785e026e22c855957b2c754c912702c58d997dedbc9a042f05d152f6db0fbd7810d95c1b880c210566c9de3093aae0ab76ad2d90e9cfaa5
+08:52:57.689 [chaincodeCmd] chaincodeDeploy -> INFO 001 Deploy result: type:GOLANG chaincodeID:<path:"github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02" name:"ee5b24a1f17c356dd5f6e37307922e39ddba12e5d2e203ed93401d7d05eb0dd194fb9070549c5dc31eb63f4e654dbd5a1d86cbb30c48e3ab1812590cd0f78539" > ctorMsg:<args:"init" args:"a" args:"100" args:"b" args:"200" >
+Deploy chaincode: ee5b24a1f17c356dd5f6e37307922e39ddba12e5d2e203ed93401d7d05eb0dd194fb9070549c5dc31eb63f4e654dbd5a1d86cbb30c48e3ab1812590cd0f78539
+08:52:57.689 [main] main -> INFO 002 Exiting.....
+```
+
+Record the transaction id.
+
+```
+T_ID="ee5b24a1f17c356dd5f6e37307922e39ddba12e5d2e203ed93401d7d05eb0dd194fb9070549c5dc31eb63f4e654dbd5a1d86cbb30c48e3ab1812590cd0f78539"
 ```
 
 Query `a`'s current value, which is 100.
 ```sh
-$ peer chaincode query -n 5844bc142dcc9e788785e026e22c855957b2c754c912702c58d997dedbc9a042f05d152f6db0fbd7810d95c1b880c210566c9de3093aae0ab76ad2d90e9cfaa5 -c '{"Function": "query", "Args": ["a"]}'
-13:20:07.952 [crypto] main -> INFO 001 Log level recognized 'info', set to INFO
-100
+$ peer chaincode query -n ${T_ID} -c '{"Function": "query", "Args": ["a"]}'
+08:57:27.075 [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Successfully queried transaction: chaincodeSpec:<type:GOLANG chaincodeID:<name:"ee5b24a1f17c356dd5f6e37307922e39ddba12e5d2e203ed93401d7d05eb0dd194fb9070549c5dc31eb63f4e654dbd5a1d86cbb30c48e3ab1812590cd0f78539" > ctorMsg:<args:"query" args:"a" > >
+Query Result: 100
+08:57:27.075 [main] main -> INFO 002 Exiting.....
 ```
 
 Invoke a transaction of 10 from `a` to `b`.
 ```sh
-$ peer chaincode invoke -n 5844bc142dcc9e788785e026e22c855957b2c754c912702c58d997dedbc9a042f05d152f6db0fbd7810d95c1b880c210566c9de3093aae0ab76ad2d90e9cfaa5 -c '{"Function": "invoke", "Args": ["a", "b", "10"]}'
-13:20:31.028 [crypto] main -> INFO 001 Log level recognized 'info', set to INFO
-ec3c675b-a2fe-4429-ab44-7f389e454657
+$ peer chaincode invoke -n ${T_ID} -c '{"Function": "invoke", "Args": ["a", "b", "10"]}'
+08:58:03.412 [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Successfully invoked transaction: chaincodeSpec:<type:GOLANG chaincodeID:<name:"ee5b24a1f17c356dd5f6e37307922e39ddba12e5d2e203ed93401d7d05eb0dd194fb9070549c5dc31eb63f4e654dbd5a1d86cbb30c48e3ab1812590cd0f78539" > ctorMsg:<args:"invoke" args:"a" args:"b" args:"10" > > (25062902-5c26-461f-b099-6d5af05d477d)
+08:58:03.413 [main] main -> INFO 002 Exiting.....
 ```
+
 Query `a` 's value now.
 ```sh
-$ peer chaincode query -n 5844bc142dcc9e788785e026e22c855957b2c754c912702c58d997dedbc9a042f05d152f6db0fbd7810d95c1b880c210566c9de3093aae0ab76ad2d90e9cfaa5 -c '{"Function": "query", "Args": ["a"]}'
-13:20:35.725 [crypto] main -> INFO 001 Log level recognized 'info', set to INFO
-90
+$ peer chaincode query -n ${T_ID} -c '{"Function": "query", "Args": ["a"]}'
+08:58:38.771 [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 001 Successfully queried transaction: chaincodeSpec:<type:GOLANG chaincodeID:<name:"ee5b24a1f17c356dd5f6e37307922e39ddba12e5d2e203ed93401d7d05eb0dd194fb9070549c5dc31eb63f4e654dbd5a1d86cbb30c48e3ab1812590cd0f78539" > ctorMsg:<args:"query" args:"a" > >
+Query Result: 90
+08:58:38.771 [main] main -> INFO 002 Exiting.....
 ```
 
 More examples, please refer to [hyperledger-compose-files](https://github.com/yeasy/docker-compose-files#hyperledger).
-
 
 If you wanna manually start.
 
