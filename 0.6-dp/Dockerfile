@@ -30,7 +30,6 @@ RUN mkdir -p /var/hyperledger/db \
 # install hyperledger peer and membersrvc
 RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cd $GOPATH/src/github.com/hyperledger \
-#&& git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric.git \
         && git clone --single-branch -b v0.6 --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
         && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
