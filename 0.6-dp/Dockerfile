@@ -32,6 +32,7 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b v0.6 --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
         && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
+        && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $GOPATH/bin \
         && go clean \
         && cd $GOPATH/src/github.com/hyperledger/fabric/membersrvc \
         && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
@@ -40,9 +41,9 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cp $GOPATH/src/github.com/hyperledger/fabric/devenv/limits.conf /etc/security/limits.conf
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
-RUN ln -s $GOPATH /opt/gopath
+# RUN ln -s $GOPATH /opt/gopath
 
 # this is to keep compatible
-RUN PATH=$GOPATH/src/github.com/hyperledger/fabric/build/bin:$PATH
+# RUN PATH=$GOPATH/src/github.com/hyperledger/fabric/build/bin:$PATH
 
 WORKDIR $GOPATH/src/github.com/hyperledger/fabric
