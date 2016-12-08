@@ -21,7 +21,6 @@ RUN cd /tmp \
         && PORTABLE=1 make shared_lib \
         && INSTALL_PATH=/usr/local make install-shared \
         && ldconfig \
-        && cd / \
         && rm -rf /tmp/rocksdb
 
 RUN mkdir -p /var/hyperledger/db \
