@@ -1,4 +1,4 @@
-# Dockerfile for Hyperledger fabric base and peer image.
+# Dockerfile for Hyperledger fabric base image, with everything (peer, membersrvc) to go!
 # If you need a peer node to run, please see the yeasy/hyperledger-peer image.
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
@@ -27,12 +27,15 @@ RUN cd /tmp \
 RUN mkdir -p /var/hyperledger/db \
         && mkdir -p /var/hyperledger/production
 
-# install hyperledger peer
+# install hyperledger peer and membersrvc
 RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cd $GOPATH/src/github.com/hyperledger \
 #&& git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric.git \
-        && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
+        && git clone --single-branch -b v0.6 --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
+        && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
+        && go clean \
+        && cd $GOPATH/src/github.com/hyperledger/fabric/membersrvc \
         && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
         && go clean \
         && cp $GOPATH/src/github.com/hyperledger/fabric/devenv/limits.conf /etc/security/limits.conf
