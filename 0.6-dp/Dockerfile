@@ -1,4 +1,4 @@
-# Dockerfile for Hyperledger fabric base image, with everything (peer, membersrvc) to go!
+# Dockerfile for Hyperledger fabric 0.6-dp, with everything (base, peer, membersrvc) to go!
 # If you need a peer node to run, please see the yeasy/hyperledger-peer image.
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
@@ -26,6 +26,9 @@ RUN cd /tmp \
 RUN mkdir -p /var/hyperledger/db \
         && mkdir -p /var/hyperledger/production
 
+# this is only a workaround for current hard-coded problem when using as fabric-baseimage.
+RUN ln -s $GOPATH /opt/gopath
+
 # install hyperledger peer and membersrvc
 RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cd $GOPATH/src/github.com/hyperledger \
@@ -39,9 +42,6 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cp $GOPATH/src/github.com/hyperledger/fabric/membersrvc/membersrvc.yaml $GOPATH/bin \
         && go clean \
         && cp $GOPATH/src/github.com/hyperledger/fabric/devenv/limits.conf /etc/security/limits.conf
-
-# this is only a workaround for current hard-coded problem when using as fabric-baseimage.
-# RUN ln -s $GOPATH /opt/gopath
 
 # this is to keep compatible
 # RUN PATH=$GOPATH/src/github.com/hyperledger/fabric/build/bin:$PATH
