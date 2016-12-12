@@ -25,21 +25,24 @@ RUN cd /tmp \
         && rm -rf /tmp/rocksdb
 
 RUN mkdir -p /var/hyperledger/db \
-        && mkdir -p /var/hyperledger/production
+        && mkdir -p /var/hyperledger/production \
+        && mkdir -p /etc/hyperledger/fabric
 
 # install hyperledger peer
 RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
+        && cp $GOPATH/src/github.com/hyperledger/fabric/devenv/limits.conf /etc/security/limits.conf \
+# build peer
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
         && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
         && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $GOPATH/bin \
         && go clean \
-        && cd $GOPATH/src/github.com/hyperledger/fabric/membersrvc \
-        && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
-        && cp $GOPATH/src/github.com/hyperledger/fabric/membersrvc/membersrvc.yaml $GOPATH/bin \
-        && go clean \
-        && cp $GOPATH/src/github.com/hyperledger/fabric/devenv/limits.conf /etc/security/limits.conf
+# build orderer
+        && cd $GOPATH/src/github.com/hyperledger/fabric/order \
+        &&  go install \
+        && cp $GOPATH/src/github.com/hyperledger/fabric/order/orderer.yaml $GOPATH/bin \
+        && go clean
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
