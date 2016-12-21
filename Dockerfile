@@ -44,6 +44,7 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cp $GOPATH/src/github.com/hyperledger/fabric/devenv/limits.conf /etc/security/limits.conf \
 # install gotools
+        && cd $GOPATH/src/github.com/hyperledger/fabric/ \
         && make gotools \
 # build peer
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
