@@ -1,4 +1,4 @@
-# Dockerfile for Hyperledger fabric base and peer image.
+# Dockerfile for Hyperledger fabric development.
 # If you need a peer node to run, please see the yeasy/hyperledger-peer image.
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
@@ -10,8 +10,18 @@ MAINTAINER Baohua Yang
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# This is the source code dir, can map external one with -v
+VOLUME $GOPATH/src/github.com/hyperledger
+
+# The data and config dir, can map external one with -v
+VOLUME /var/hyperledger
+VOLUME /etc/hyperledger
+
 RUN apt-get update \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev \
+        && apt-get install -y python-pip \
+        && pip install --upgrade pip \
+        && pip install behave nose docker-compose \
         && rm -rf /var/cache/apt
 
 # install rocksdb
@@ -28,19 +38,21 @@ RUN mkdir -p /var/hyperledger/db \
         && mkdir -p /var/hyperledger/production \
         && mkdir -p /etc/hyperledger/fabric
 
-# install hyperledger peer
+# clone hyperledger code
 RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cp $GOPATH/src/github.com/hyperledger/fabric/devenv/limits.conf /etc/security/limits.conf \
+# install gotools
+        && make gotools \
 # build peer
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
         && CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
         && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $GOPATH/bin \
         && go clean \
 # build orderer
-        && cd $GOPATH/src/github.com/hyperledger/fabric/order \
-        &&  go install \
+        && cd $GOPATH/src/github.com/hyperledger/fabric/orderer \
+        && go install \
         && cp $GOPATH/src/github.com/hyperledger/fabric/order/orderer.yaml $GOPATH/bin \
         && go clean
 
