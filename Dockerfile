@@ -10,12 +10,17 @@ MAINTAINER Baohua Yang
 
 ENV DEBIAN_FRONTEND noninteractive
 
+EXPOSE 7050
+
+ENV PEER_CFG_PATH /etc/hyperledger/fabric
+ENV ORDERER_CFG_PATH /etc/hyperledger/fabric
+
 # This is the source code dir, can map external one with -v
 VOLUME $GOPATH/src/github.com/hyperledger
 
 # The data and config dir, can map external one with -v
 VOLUME /var/hyperledger
-VOLUME /etc/hyperledger
+VOLUME /etc/hyperledger/fabric
 
 RUN apt-get update \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev \
@@ -38,9 +43,7 @@ RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0
 #        && cd / \
 #        && rm -rf /tmp/rocksdb
 
-RUN mkdir -p /var/hyperledger/db \
-        && mkdir -p /var/hyperledger/production \
-        && mkdir -p /etc/hyperledger/fabric
+RUN mkdir -p /var/hyperledger/db  /var/hyperledger/production /etc/hyperledger/fabric
 
 # clone hyperledger code
 RUN mkdir -p $GOPATH/src/github.com/hyperledger \
@@ -58,9 +61,11 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && go clean \
 # build orderer
         && cd $GOPATH/src/github.com/hyperledger/fabric/orderer \
-        && go install \
+        && CGO_CFLAGS=" " go install -ldflags "-X github.com/hyperledger/fabric/common/metadata.Version=1.0.0-snapshot-preview -linkmode external -extldflags '-static -lpthread'" \
         && cp $GOPATH/src/github.com/hyperledger/fabric/order/orderer.yaml $GOPATH/bin \
         && go clean
+
+#TODO: also add the msp sample configs
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
