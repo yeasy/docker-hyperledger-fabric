@@ -1,19 +1,19 @@
-# Dockerfile for Hyperledger fabric development.
-# If you need a peer node to run, please see the yeasy/hyperledger-peer image.
+# Dockerfile for Hyperledger fabric development, including most necessary binaries and dev tools.
+# If you need a peer node to run, please see the yeasy/hyperledger-peer, yeasy/hyperledger-orderer image.
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
 # Currently, the binary will look for config files at corresponding path.
 
 FROM golang:1.7
-MAINTAINER Baohua Yang
+MAINTAINER Baohua Yang <yeasy.github.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
 EXPOSE 7050
 
 ENV PEER_CFG_PATH /etc/hyperledger/fabric
-ENV ORDERER_CFG_PATH /etc/hyperledger/fabric
+ENV ORDERER_CFG_PATH /etc/hyperledger/fabric/orderer
 
 # This is the source code dir, can map external one with -v
 VOLUME $GOPATH/src/github.com/hyperledger
@@ -57,12 +57,12 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
 #&& CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
         && CGO_CFLAGS=" " go install -ldflags "-X github.com/hyperledger/fabric/common/metadata.Version=1.0.0-snapshot-preview -linkmode external -extldflags '-static -lpthread'" \
-        && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $GOPATH/bin \
+        && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $PEER_CFG_PATH \
         && go clean \
 # build orderer
         && cd $GOPATH/src/github.com/hyperledger/fabric/orderer \
         && CGO_CFLAGS=" " go install -ldflags "-X github.com/hyperledger/fabric/common/metadata.Version=1.0.0-snapshot-preview -linkmode external -extldflags '-static -lpthread'" \
-        && cp $GOPATH/src/github.com/hyperledger/fabric/order/orderer.yaml $GOPATH/bin \
+        && cp $GOPATH/src/github.com/hyperledger/fabric/order/orderer.yaml $ORDERER_CFG_PATH \
         && go clean
 
 #TODO: also add the msp sample configs
