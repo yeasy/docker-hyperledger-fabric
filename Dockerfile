@@ -55,7 +55,6 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
 # install gotools
         && cd $FABRIC_PATH/ \
         && make gotools \
-        && make clean \
 # build peer
         && cd $FABRIC_PATH/peer \
 #&& CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
