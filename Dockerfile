@@ -33,7 +33,7 @@ RUN apt-get update \
         && rm -rf /var/cache/apt
 
 # install chaintool
-RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.1/chaintool > /usr/local/bin \
+RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.1/chaintool > /usr/local/bin/chaintool \
         && chmod a+x /usr/local/bin/chaintool
 
 # install rocksdb
