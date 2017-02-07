@@ -10,9 +10,8 @@ MAINTAINER Baohua Yang <yeasy.github.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-EXPOSE 7050
-
 ENV PEER_CFG_PATH /etc/hyperledger/fabric
+ENV CORE_PEER_MSPCONFIGPATH $PEER_CFG_PATH/msp/sampleconfig
 ENV ORDERER_CFG_PATH /etc/hyperledger/fabric/orderer
 
 # This is the source code dir, can map external one with -v
@@ -29,7 +28,7 @@ RUN apt-get update \
         && pip install behave nose docker-compose \
         && rm -rf /var/cache/apt
 
-# install some dev tools, optionally
+# install chaintool
 RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.1/chaintool > /usr/local/bin \
         && chmod a+x /usr/local/bin/chaintool
 
@@ -43,7 +42,7 @@ RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0
 #        && cd / \
 #        && rm -rf /tmp/rocksdb
 
-RUN mkdir -p /var/hyperledger/db  /var/hyperledger/production /etc/hyperledger/fabric
+RUN mkdir -p /var/hyperledger/db /var/hyperledger/production $PEER_CFG_PATH $ORDERER_CFG_PATH
 
 # clone hyperledger code
 RUN mkdir -p $GOPATH/src/github.com/hyperledger \
@@ -57,15 +56,20 @@ RUN mkdir -p $GOPATH/src/github.com/hyperledger \
         && cd $GOPATH/src/github.com/hyperledger/fabric/peer \
 #&& CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install \
         && CGO_CFLAGS=" " go install -ldflags "-X github.com/hyperledger/fabric/common/metadata.Version=1.0.0-snapshot-preview -linkmode external -extldflags '-static -lpthread'" \
-        && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $PEER_CFG_PATH \
         && go clean \
+        && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $PEER_CFG_PATH \
+        && mkdir -p $PEER_CFG_PATH/msp/sampleconfig \
+        && cp -r $GOPATH/src/github.com/hyperledger/fabric/msp/sampleconfig/* $PEER_CFG_PATH/msp/sampleconfig \
+        && mkdir -p $PEER_CFG_PATH/common/configtx/test \
+        && cp $GOPATH/src/github.com/hyperledger/fabric/common/configtx/test/orderer.template $PEER_CFG_PATH/common/configtx/test \
 # build orderer
         && cd $GOPATH/src/github.com/hyperledger/fabric/orderer \
         && CGO_CFLAGS=" " go install -ldflags "-X github.com/hyperledger/fabric/common/metadata.Version=1.0.0-snapshot-preview -linkmode external -extldflags '-static -lpthread'" \
+        && go clean \
         && cp $GOPATH/src/github.com/hyperledger/fabric/order/orderer.yaml $ORDERER_CFG_PATH \
-        && go clean
+        && mkdir -p $ORDERER_CFG_PATH/msp/sampleconfig \
+        && cp -r $GOPATH/src/github.com/hyperledger/fabric/msp/sampleconfig/* $ORDERER_CFG_PATH/msp/sampleconfig
 
-#TODO: also add the msp sample configs
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
