@@ -23,8 +23,6 @@ ENV DOCKER_NS hyperledger
 # for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
 ENV BASE_DOCKER_NS hyperledger
 
-ENV LDFLAGS 
-
 # peer env 
 ENV PEER_CFG_PATH /etc/hyperledger/fabric
 ENV CORE_PEER_MSPCONFIGPATH $PEER_CFG_PATH/msp/sampleconfig
