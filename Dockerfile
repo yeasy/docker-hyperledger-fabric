@@ -51,7 +51,7 @@ RUN mkdir -p /var/hyperledger/db \
         /chaincode/output
 
 RUN apt-get update \
-        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev \
+        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml \
         && apt-get install -y python-pip \
         && pip install --upgrade pip \
         && pip install behave nose docker-compose \
