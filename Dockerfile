@@ -63,8 +63,7 @@ RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0
         && chmod a+x /usr/local/bin/chaintool
 
 # install gotools
-RUN cd $FABRIC_HOME/ \
-        && go get github.com/golang/lint/golint \
+RUN go get github.com/golang/lint/golint \
         && go get github.com/kardianos/govendor \
         && go get golang.org/x/tools/cmd/goimports \
         && go get github.com/golang/protobuf/protoc-gen-go \
