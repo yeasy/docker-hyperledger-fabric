@@ -36,7 +36,7 @@ ENV ORDERER_GENERAL_LISTENADDRESS 0.0.0.0
 ENV CONFIGTX_ORDERER_ORDERERTYPE=solo
 
 # This is the source code dir, can map external one with -v
-VOLUME $GOPATH/src/github.com/hyperledger
+# VOLUME $GOPATH/src/github.com/hyperledger
 
 # The data and config dir, can map external one with -v
 VOLUME /var/hyperledger
@@ -44,6 +44,7 @@ VOLUME /var/hyperledger
 
 RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/production \
+        $GOPATH/src/github.com/hyperledger \
         $PEER_CFG_PATH \
         $ORDERER_CFG_PATH \
         $ORDERER_GENERAL_LOCALMSPDIR \
@@ -72,8 +73,7 @@ RUN go get github.com/golang/lint/golint \
         && go get github.com/AlekSi/gocov-xml
 
 # clone hyperledger fabric code
-RUN mkdir -p $GOPATH/src/github.com/hyperledger \
-        && cd $GOPATH/src/github.com/hyperledger \
+RUN cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cp $FABRIC_HOME/devenv/limits.conf /etc/security/limits.conf
 
