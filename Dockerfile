@@ -53,7 +53,7 @@ RUN mkdir -p /var/hyperledger/db \
 
 RUN apt-get update \
         && apt-get install -y python-dev \
-        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev \
+        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev \
         && apt-get install -y python-pip \
         && pip install --upgrade pip \
         && pip install behave nose docker-compose \
