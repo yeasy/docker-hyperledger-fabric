@@ -21,6 +21,11 @@ ENV PROJECT_VERSION 1.0.0-preview
 ENV DOCKER_NS hyperledger
 # for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
 ENV BASE_DOCKER_NS hyperledger
+ENV LDFLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
+             -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASE_VERSION} \
+             -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
+             -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
+             -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
 
 # peer env 
 ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
@@ -77,41 +82,17 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 
 # install configtxgen and cryptogen
 RUN cd $FABRIC_HOME/ \
-        && CGO_CFLAGS=" " go install -ldflags \
-        "-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASE_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
-        -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger" \
-        github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
-        && CGO_CFLAGS=" " go install -ldflags \
-        "-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASE_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
-        -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger" \
-        github.com/hyperledger/fabric/common/tools/cryptogen
+        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags $LDFLAGS github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
+        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags $LDFLAGS github.com/hyperledger/fabric/common/tools/cryptogen
 
-# install fabric peer and configs
+# install fabric peer
 RUN cd $FABRIC_HOME/peer \
-        && CGO_CFLAGS=" " go install -ldflags \
-        "-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASE_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
-        -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=${DOCKER_NS} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=${BASE_DOCKER_NS} \
-        -linkmode external -extldflags '-static -lpthread'" \
+        && CGO_CFLAGS=" " go install -ldflags "$LDFLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
-# install hyperledger fabric orderer
+# install fabric orderer
 RUN cd $FABRIC_HOME/orderer \
-        && CGO_CFLAGS=" " go install -ldflags \
-        "-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASE_VERSION} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
-        -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=${DOCKER_NS} \
-        -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=${BASE_DOCKER_NS} \
-        -linkmode external -extldflags '-static -lpthread'" \
+        && CGO_CFLAGS=" " go install -ldflags "$LDFLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
