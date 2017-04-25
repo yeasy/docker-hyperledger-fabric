@@ -82,8 +82,8 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 
 # install configtxgen and cryptogen
 RUN cd $FABRIC_HOME/ \
-        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags $LDFLAGS github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
-        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags $LDFLAGS github.com/hyperledger/fabric/common/tools/cryptogen
+        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LDFLAGS" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
+        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LDFLAGS" github.com/hyperledger/fabric/common/tools/cryptogen
 
 # install fabric peer
 RUN cd $FABRIC_HOME/peer \
