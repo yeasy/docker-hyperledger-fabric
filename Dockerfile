@@ -13,7 +13,6 @@ ENV DEBIAN_FRONTEND noninteractive
 # Only useful for this Dockerfile
 ENV FABRIC_HOME $GOPATH/src/github.com/hyperledger/fabric
 ENV ARCH x86_64
-
 # version for the base images, e.g., fabric-ccenv, fabric-baseos
 ENV BASE_VERSION 0.3.0
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
@@ -24,14 +23,14 @@ ENV DOCKER_NS hyperledger
 ENV BASE_DOCKER_NS hyperledger
 
 # peer env 
-ENV PEER_CFG_PATH /etc/hyperledger/fabric
-ENV CORE_PEER_MSPCONFIGPATH $PEER_CFG_PATH/msp/sampleconfig
+ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
+ENV CORE_PEER_MSPCONFIGPATH $FABRIC_CFG_PATH/msp/sampleconfig
 # ignore handshake, since not using mutual TLS
 ENV CORE_PEER_GOSSIP_SKIPHANDSHAKE true
 
 # orderer env 
-ENV ORDERER_CFG_PATH /etc/hyperledger/fabric/orderer
-ENV ORDERER_GENERAL_LOCALMSPDIR $ORDERER_CFG_PATH/msp/sampleconfig
+ENV ORDERER_GENERAL_GENESISPROFILE=SampleInsecureSolo
+ENV ORDERER_GENERAL_LOCALMSPDIR $ORDERER_CFG_PATH/sampleconfig
 ENV ORDERER_GENERAL_LISTENADDRESS 0.0.0.0
 ENV CONFIGTX_ORDERER_ORDERERTYPE=solo
 
@@ -45,15 +44,13 @@ VOLUME /var/hyperledger
 RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/production \
         $GOPATH/src/github.com/hyperledger \
-        $PEER_CFG_PATH \
-        $ORDERER_CFG_PATH \
-        $ORDERER_GENERAL_LOCALMSPDIR \
+        $FABRIC_CFG_PATH \
         /chaincode/input \
         /chaincode/output
 
 RUN apt-get update \
         && apt-get install -y python-dev \
-        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev \
+        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev vim \
         && apt-get install -y python-pip \
         && pip install --upgrade pip \
         && pip install behave nose docker-compose \
@@ -72,10 +69,11 @@ RUN go get github.com/golang/lint/golint \
         && go get github.com/axw/gocov/... \
         && go get github.com/AlekSi/gocov-xml
 
-# clone hyperledger fabric code
+# clone hyperledger fabric code and cp configs
 RUN cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
-        && cp $FABRIC_HOME/devenv/limits.conf /etc/security/limits.conf
+        && cp $FABRIC_HOME/devenv/limits.conf /etc/security/limits.conf \
+        && cp -r $FABRIC_HOME/sampleconfig/ $FABRIC_CFG_PATH/
 
 # install configtxgen and cryptogen
 RUN cd $FABRIC_HOME/ \
@@ -103,12 +101,7 @@ RUN cd $FABRIC_HOME/peer \
         -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=${DOCKER_NS} \
         -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=${BASE_DOCKER_NS} \
         -linkmode external -extldflags '-static -lpthread'" \
-        && go clean \
-        && cp $FABRIC_HOME/peer/core.yaml $PEER_CFG_PATH \
-        && mkdir -p $PEER_CFG_PATH/msp/sampleconfig \
-        && cp -r $FABRIC_HOME/msp/sampleconfig/* $PEER_CFG_PATH/msp/sampleconfig \
-        && mkdir -p $PEER_CFG_PATH/common/configtx/tool \
-        && cp $FABRIC_HOME/common/configtx/tool/configtx.yaml $PEER_CFG_PATH/
+        && go clean
 
 # install hyperledger fabric orderer
 RUN cd $FABRIC_HOME/orderer \
@@ -119,10 +112,7 @@ RUN cd $FABRIC_HOME/orderer \
         -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=${DOCKER_NS} \
         -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=${BASE_DOCKER_NS} \
         -linkmode external -extldflags '-static -lpthread'" \
-        && go clean \
-        && cp $FABRIC_HOME/orderer/orderer.yaml $ORDERER_CFG_PATH/ \
-        && cp -r $FABRIC_HOME/msp/sampleconfig/* $ORDERER_GENERAL_LOCALMSPDIR \
-        && cp $FABRIC_HOME/common/configtx/tool/configtx.yaml $ORDERER_CFG_PATH
+        && go clean
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
