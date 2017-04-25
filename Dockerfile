@@ -29,7 +29,7 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
 
 # peer env 
 ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
-ENV CORE_PEER_MSPCONFIGPATH $FABRIC_CFG_PATH/msp/sampleconfig
+ENV CORE_PEER_MSPCONFIGPATH $FABRIC_CFG_PATH/msp
 # ignore handshake, since not using mutual TLS
 ENV CORE_PEER_GOSSIP_SKIPHANDSHAKE true
 
