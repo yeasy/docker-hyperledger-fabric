@@ -21,7 +21,7 @@ ENV PROJECT_VERSION 1.0.0-preview
 ENV DOCKER_NS hyperledger
 # for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
 ENV BASE_DOCKER_NS hyperledger
-ENV LDFLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
+ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
              -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASE_VERSION} \
              -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
              -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
@@ -55,8 +55,9 @@ RUN mkdir -p /var/hyperledger/db \
 
 RUN apt-get update \
         && apt-get install -y python-dev \
-        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev vim \
+        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev\
         && apt-get install -y python-pip \
+        && apt-get install -y vim \
         && pip install --upgrade pip \
         && pip install behave nose docker-compose \
         && rm -rf /var/cache/apt
@@ -82,17 +83,17 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 
 # install configtxgen and cryptogen
 RUN cd $FABRIC_HOME/ \
-        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LDFLAGS" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
-        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LDFLAGS" github.com/hyperledger/fabric/common/tools/cryptogen
+        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
+        && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/common/tools/cryptogen
 
 # install fabric peer
 RUN cd $FABRIC_HOME/peer \
-        && CGO_CFLAGS=" " go install -ldflags "$LDFLAGS -linkmode external -extldflags '-static -lpthread'" \
+        && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
 # install fabric orderer
 RUN cd $FABRIC_HOME/orderer \
-        && CGO_CFLAGS=" " go install -ldflags "$LDFLAGS -linkmode external -extldflags '-static -lpthread'" \
+        && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
