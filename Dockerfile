@@ -46,6 +46,9 @@ ENV CONFIGTX_ORDERER_ORDERERTYPE=solo
 VOLUME /var/hyperledger
 #VOLUME /etc/hyperledger/fabric
 
+# This is useful to debug local code
+VOLUME $GOPATH/src/github.com/hyperledger
+
 RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/production \
         $GOPATH/src/github.com/hyperledger \
@@ -54,8 +57,8 @@ RUN mkdir -p /var/hyperledger/db \
         /chaincode/output
 
 RUN apt-get update \
-        && apt-get install -y python-dev \
-        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev\
+        && apt-get install -y apt-utils python-dev \
+        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev \
         && apt-get install -y python-pip \
         && apt-get install -y vim \
         && pip install --upgrade pip \
@@ -99,7 +102,7 @@ RUN cd $FABRIC_HOME/orderer \
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
 
-# this is to keep compatible
-# RUN PATH=$FABRIC_HOME/build/bin:$PATH
+# Useful scripts for debugging local code
+ADD *.sh /tmp
 
 WORKDIR $FABRIC_HOME
