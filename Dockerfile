@@ -39,15 +39,9 @@ ENV ORDERER_GENERAL_LOCALMSPDIR $ORDERER_CFG_PATH/sampleconfig
 ENV ORDERER_GENERAL_LISTENADDRESS 0.0.0.0
 ENV CONFIGTX_ORDERER_ORDERERTYPE=solo
 
-# This is the source code dir, can map external one with -v
-# VOLUME $GOPATH/src/github.com/hyperledger
-
 # The data and config dir, can map external one with -v
 VOLUME /var/hyperledger
 #VOLUME /etc/hyperledger/fabric
-
-# This is useful to debug local code
-VOLUME $GOPATH/src/github.com/hyperledger
 
 RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/production \
@@ -72,11 +66,11 @@ RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0
 # install gotools
 RUN go get github.com/golang/lint/golint \
         && go get github.com/kardianos/govendor \
-        && go get golang.org/x/tools/cmd/goimports \
         && go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/onsi/ginkgo/ginkgo \
         && go get github.com/axw/gocov/... \
-        && go get github.com/AlekSi/gocov-xml
+        && go get github.com/AlekSi/gocov-xml \
+        && go get golang.org/x/tools/cmd/goimports
 
 # clone hyperledger fabric code and cp configs
 RUN cd $GOPATH/src/github.com/hyperledger \
@@ -101,6 +95,9 @@ RUN cd $FABRIC_HOME/orderer \
 
 # this is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
+
+# This is useful to debug local code
+VOLUME $GOPATH/src/github.com/hyperledger
 
 # Useful scripts for debugging local code
 ADD *.sh /tmp
