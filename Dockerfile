@@ -35,7 +35,7 @@ ENV CORE_PEER_GOSSIP_SKIPHANDSHAKE true
 
 # orderer env 
 ENV ORDERER_GENERAL_GENESISPROFILE=SampleInsecureSolo
-ENV ORDERER_GENERAL_LOCALMSPDIR $ORDERER_CFG_PATH/sampleconfig
+ENV ORDERER_GENERAL_LOCALMSPDIR $ORDERER_CFG_PATH/msp
 ENV ORDERER_GENERAL_LISTENADDRESS 0.0.0.0
 ENV CONFIGTX_ORDERER_ORDERERTYPE=solo
 
@@ -76,7 +76,7 @@ RUN go get github.com/golang/lint/golint \
 RUN cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cp $FABRIC_HOME/devenv/limits.conf /etc/security/limits.conf \
-        && cp -r $FABRIC_HOME/sampleconfig/ $FABRIC_CFG_PATH/
+        && cp -r $FABRIC_HOME/sampleconfig/* $FABRIC_CFG_PATH/
 
 # install configtxgen and cryptogen
 RUN cd $FABRIC_HOME/ \
