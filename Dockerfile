@@ -100,6 +100,6 @@ RUN ln -s $GOPATH /opt/gopath
 VOLUME $GOPATH/src/github.com/hyperledger
 
 # Useful scripts for debugging local code
-ADD *.sh /tmp
+ADD *.sh /tmp/
 
 WORKDIR $FABRIC_HOME
