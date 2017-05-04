@@ -32,6 +32,7 @@ ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
 ENV CORE_PEER_MSPCONFIGPATH $FABRIC_CFG_PATH/msp
 # ignore handshake, since not using mutual TLS
 ENV CORE_PEER_GOSSIP_SKIPHANDSHAKE true
+ENV CORE_LOGGING_LEVEL DEBUG
 
 # orderer env 
 ENV ORDERER_GENERAL_GENESISPROFILE=SampleInsecureSolo
