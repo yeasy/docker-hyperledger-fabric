@@ -1,9 +1,13 @@
-# Dockerfile for Hyperledger fabric development, including most necessary binaries and dev tools.
-# If you need a peer node to run, please see the yeasy/hyperledger-peer, yeasy/hyperledger-orderer image.
+# Dockerfile for Hyperledger fabric all-in-one development, including:
+# * fabric-peer
+# * fabric-orderer
+# * cryptogen
+# * configtxgen
+# * chaintools
+# * gotools
+# If you need a pure peer node to run, please see the yeasy/hyperledger-peer, yeasy/hyperledger-orderer image.
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
-
-# Currently, the binary will look for config files at corresponding path.
 
 FROM golang:1.8
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
@@ -11,8 +15,9 @@ LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 ENV DEBIAN_FRONTEND noninteractive
 
 # Only useful for this Dockerfile
-ENV FABRIC_HOME $GOPATH/src/github.com/hyperledger/fabric
+ENV FABRIC_ROOT $GOPATH/src/github.com/hyperledger/fabric
 ENV ARCH x86_64
+
 # version for the base images, e.g., fabric-ccenv, fabric-baseos
 ENV BASE_VERSION 0.3.0
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
@@ -36,7 +41,7 @@ ENV CORE_LOGGING_LEVEL DEBUG
 
 # orderer env 
 ENV ORDERER_GENERAL_GENESISPROFILE=SampleInsecureSolo
-ENV ORDERER_GENERAL_LOCALMSPDIR $ORDERER_CFG_PATH/msp
+ENV ORDERER_GENERAL_LOCALMSPDIR $FABRIC_CFG_PATH/msp
 ENV ORDERER_GENERAL_LISTENADDRESS 0.0.0.0
 ENV CONFIGTX_ORDERER_ORDERERTYPE=solo
 
@@ -51,6 +56,7 @@ RUN mkdir -p /var/hyperledger/db \
         /chaincode/input \
         /chaincode/output
 
+# Install development dependencies
 RUN apt-get update \
         && apt-get install -y apt-utils python-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev \
@@ -60,11 +66,11 @@ RUN apt-get update \
         && pip install behave nose docker-compose \
         && rm -rf /var/cache/apt
 
-# install chaintool
+# Install chaintool
 RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.1/chaintool > /usr/local/bin/chaintool \
         && chmod a+x /usr/local/bin/chaintool
 
-# install gotools
+# Install gotools
 RUN go get github.com/golang/lint/golint \
         && go get github.com/kardianos/govendor \
         && go get github.com/golang/protobuf/protoc-gen-go \
@@ -73,34 +79,34 @@ RUN go get github.com/golang/lint/golint \
         && go get github.com/AlekSi/gocov-xml \
         && go get golang.org/x/tools/cmd/goimports
 
-# clone hyperledger fabric code and cp configs
+# Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
-        && cp $FABRIC_HOME/devenv/limits.conf /etc/security/limits.conf \
-        && cp -r $FABRIC_HOME/sampleconfig/* $FABRIC_CFG_PATH/
+        && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
+        && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
 # install configtxgen and cryptogen
-RUN cd $FABRIC_HOME/ \
+RUN cd $FABRIC_ROOT/ \
         && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
         && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/common/tools/cryptogen
 
 # install fabric peer
-RUN cd $FABRIC_HOME/peer \
+RUN cd $FABRIC_ROOT/peer \
         && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
 # install fabric orderer
-RUN cd $FABRIC_HOME/orderer \
+RUN cd $FABRIC_ROOT/orderer \
         && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
-# this is only a workaround for current hard-coded problem when using as fabric-baseimage.
+# This is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
 
-# This is useful to debug local code
+# This is useful to debug local code with mapping inside
 VOLUME $GOPATH/src/github.com/hyperledger
 
-# Useful scripts for debugging local code
+# Useful scripts for quickly compiling local code
 ADD *.sh /tmp/
 
-WORKDIR $FABRIC_HOME
+WORKDIR $FABRIC_ROOT

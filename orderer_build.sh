@@ -1,3 +1,6 @@
+#!/bin/bash 
+
+echo "Building fabric-orderer"
 CGO_CFLAGS=" " \
 go install -tags "" \
 -ldflags "-X github.com/hyperledger/fabric/common/metadata.Version=1.0.0-preview \
