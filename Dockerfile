@@ -61,7 +61,7 @@ RUN apt-get update \
         && apt-get install -y apt-utils python-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev \
         && apt-get install -y python-pip \
-        && apt-get install -y vim \
+        && apt-get install -y vim tree \
         && pip install --upgrade pip \
         && pip install behave nose docker-compose \
         && rm -rf /var/cache/apt
