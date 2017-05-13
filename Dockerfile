@@ -1,11 +1,17 @@
 # Dockerfile for Hyperledger fabric all-in-one development, including:
 # * fabric-peer
 # * fabric-orderer
+# * fabric-ca
 # * cryptogen
 # * configtxgen
 # * chaintools
 # * gotools
-# If you need a pure peer node to run, please see the yeasy/hyperledger-peer, yeasy/hyperledger-orderer image.
+
+# If you need a pure peer node to run, please see the 
+# * yeasy/hyperledger-peer
+# * yeasy/hyperledger-orderer
+# * yeasy/hyperledger-ca
+
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
