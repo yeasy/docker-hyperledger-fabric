@@ -53,18 +53,15 @@ The image is built based on [golang](https://hub.docker.com/_/golang) image.
 ## install dependencies
 Install required libsnappy-dev, zlib1g-dev, libbz2-dev.
 
-## install rocksdb
-Install required  rocksdb 4.1.
-
 ## install gotools
 Install required gotools
 
 ## install hyperledger fabric
-Install hyperledger fabric and build the peer and order
+Install hyperledger fabric and build the peer, order and ca.
 
 # Supported Docker versions
 
-This image is officially supported on Docker version 1.7.0.
+This image is officially supported on Docker version 1.7.0+.
 
 Support for older versions (down to 1.0) is provided on a best-effort basis.
 
