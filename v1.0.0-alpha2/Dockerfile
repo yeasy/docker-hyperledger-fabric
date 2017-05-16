@@ -101,7 +101,8 @@ RUN go get github.com/golang/lint/golint \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b v1.0.0-alpha2 --depth 1 http://gerrit.hyperledger.org/r/fabric \
+        && git clone --single-branch -b master http://gerrit.hyperledger.org/r/fabric \
+        && cd fabric && git checkout v1.0.0-alpha2 \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
