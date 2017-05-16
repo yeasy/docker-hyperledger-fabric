@@ -35,7 +35,7 @@ ENV ARCH x86_64
 # version for the base images, e.g., fabric-ccenv, fabric-baseos
 ENV BASE_VERSION 0.3.0
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
-ENV PROJECT_VERSION 1.0.0-preview
+ENV PROJECT_VERSION 1.0.0-alpha2
 # generic builder environment: builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS hyperledger
 # for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
