@@ -140,7 +140,7 @@ VOLUME $FABRIC_CA_SERVER_HOME
 VOLUME $FABRIC_CA_CLIENT_HOME
 
 # Useful scripts for quickly compiling local code
-ADD *.sh /tmp/
+ADD scripts/*.sh /tmp/
 
 # This is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
