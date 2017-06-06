@@ -19,17 +19,16 @@ FROM golang:1.8
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
 # fabric-peers
-EXPOSE 7050
-EXPOSE 7051
-
+EXPOSE 7050 7051
 # fabric-ca-server RESTful
 EXPOSE 7054
 
 ENV DEBIAN_FRONTEND noninteractive
 
 # Only useful for this Dockerfile
-ENV FABRIC_ROOT $GOPATH/src/github.com/hyperledger/fabric
-ENV FABRIC_CA_ROOT $GOPATH/src/github.com/hyperledger/fabric-ca
+ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
+    FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
+
 ENV ARCH x86_64
 
 # version for the base images, e.g., fabric-ccenv, fabric-baseos
@@ -47,23 +46,21 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
              -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
 
 # peer env 
-ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
-ENV CORE_PEER_MSPCONFIGPATH $FABRIC_CFG_PATH/msp
-# ignore handshake, since not using mutual TLS
-ENV CORE_PEER_GOSSIP_SKIPHANDSHAKE true
-ENV CORE_LOGGING_LEVEL DEBUG
+ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric \
+    CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
+    CORE_LOGGING_LEVEL=DEBUG
 
 # orderer env 
-ENV ORDERER_GENERAL_GENESISPROFILE=SampleInsecureSolo
-ENV ORDERER_GENERAL_LOCALMSPDIR $FABRIC_CFG_PATH/msp
-ENV ORDERER_GENERAL_LISTENADDRESS 0.0.0.0
-ENV CONFIGTX_ORDERER_ORDERERTYPE=solo
+ENV ORDERER_GENERAL_GENESISPROFILE=SampleInsecureSolo \
+    ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
+    ORDERER_GENERAL_LISTENADDRESS=0.0.0.0 \
+    CONFIGTX_ORDERER_ORDERERTYPE=file
 
 # ca env, # ca-server and ca-client will check the following env in order, to get the home cfg path
-ENV FABRIC_CA_HOME /etc/hyperledger/fabric-ca-server
-ENV FABRIC_CA_SERVER_HOME /etc/hyperledger/fabric-ca-server
-ENV FABRIC_CA_CLIENT_HOME $HOME/.fabric-ca-client
-ENV CA_CFG_PATH /etc/hyperledger/fabric-ca
+ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
+    FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server \
+    FABRIC_CA_CLIENT_HOME=$HOME/.fabric-ca-client \
+    CA_CFG_PATH=/etc/hyperledger/fabric-ca
 
 RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/production \
@@ -103,7 +100,9 @@ RUN go get github.com/golang/lint/golint \
 RUN cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
-        && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
+        && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/ \
+        && cp $FABRIC_ROOT/examples/configtx.yaml $FABRIC_CFG_PATH/ \
+        && cp $FABRIC_ROOT/examples/crypto-config.yaml $FABRIC_CFG_PATH/
 
 # install configtxgen and cryptogen
 RUN cd $FABRIC_ROOT/ \
@@ -124,9 +123,9 @@ RUN cd $FABRIC_ROOT/orderer \
 # install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
     && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric-ca \
-# This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
+    # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
-# Copy example ca and key files
+    # Copy example ca and key files
     && cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
     && go clean
 
@@ -144,4 +143,10 @@ ADD scripts/*.sh /tmp/
 # This is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
 
+# temporarily fix the `go list` complain problem if not setting this, which is required in chaincode packaging
+ENV GOROOT=/usr/local/go
+
 WORKDIR $FABRIC_ROOT
+
+LABEL org.hyperledger.fabric.version=${PROJECT_VERSION} \
+      org.hyperledger.fabric.base.version=${BASE_VERSION}
