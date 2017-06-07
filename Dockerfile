@@ -88,13 +88,14 @@ RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0
         && chmod a+x /usr/local/bin/chaintool
 
 # Install gotools
-RUN go get github.com/golang/lint/golint \
+RUN go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/kardianos/govendor \
-        && go get github.com/golang/protobuf/protoc-gen-go \
+        && go get github.com/golang/lint/golint \
+        && go get golang.org/x/tools/cmd/goimports \
         && go get github.com/onsi/ginkgo/ginkgo \
         && go get github.com/axw/gocov/... \
-        && go get github.com/AlekSi/gocov-xml \
-        && go get golang.org/x/tools/cmd/goimports
+        && go get github.com/client9/misspell/cmd/misspell \
+        && go get github.com/AlekSi/gocov-xml
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
