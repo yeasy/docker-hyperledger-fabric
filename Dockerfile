@@ -105,11 +105,16 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/crypto-config.yaml $FABRIC_CFG_PATH/
 
-# install configtxgen and cryptogen
+# install configtxgen, cryptogen and configlator
 RUN cd $FABRIC_ROOT/ \
         && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/common/tools/cryptogen \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/common/tools/configtxlator
+
+# Install block-listener
+RUN cd $FABRIC_ROOT/examples/events/block-listener \
+        && go build \
+        && mv block-listener $GOPATH/bin
 
 # install fabric peer
 RUN cd $FABRIC_ROOT/peer \
