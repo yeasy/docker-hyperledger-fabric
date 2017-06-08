@@ -32,15 +32,15 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
 ENV ARCH x86_64
 
 # version for the base images, e.g., fabric-ccenv, fabric-baseos
-ENV BASE_VERSION 0.3.1
+ENV BASEIMAGE_RELEASE 0.3.1
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
 ENV PROJECT_VERSION 1.0.0-preview
 # generic builder environment: builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS hyperledger
-# for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
+# for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
 ENV BASE_DOCKER_NS hyperledger
 ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-             -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASE_VERSION} \
+             -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
              -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
              -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
              -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
@@ -155,4 +155,4 @@ ENV GOROOT=/usr/local/go
 WORKDIR $FABRIC_ROOT
 
 LABEL org.hyperledger.fabric.version=${PROJECT_VERSION} \
-      org.hyperledger.fabric.base.version=${BASE_VERSION}
+      org.hyperledger.fabric.base.version=${BASEIMAGE_RELEASE}
