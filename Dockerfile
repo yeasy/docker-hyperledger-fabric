@@ -54,8 +54,7 @@ ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
 
 # orderer env 
 ENV ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
-    ORDERER_GENERAL_LISTENADDRESS=0.0.0.0 \
-    CONFIGTX_ORDERER_ORDERERTYPE=file
+    ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
 
 # ca env, # ca-server and ca-client will check the following env in order, to get the home cfg path
 ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
