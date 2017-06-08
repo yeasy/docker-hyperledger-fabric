@@ -48,7 +48,7 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
              -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
 
 # peer env 
-ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric \
+ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
 ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
     CORE_LOGGING_LEVEL=DEBUG
 
