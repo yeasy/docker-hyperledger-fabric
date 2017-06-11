@@ -4,6 +4,7 @@
 # * fabric-ca
 # * cryptogen
 # * configtxgen
+# * configtxlator
 # * chaintools
 # * gotools
 
