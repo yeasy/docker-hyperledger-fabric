@@ -55,7 +55,8 @@ ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
 
 # orderer env 
 ENV ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
-    ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+    ORDERER_GENERAL_LISTENADDRESS=0.0.0.0 \
+    ORDERER_GENERAL_GENESISPROFILE=TwoOrgsOrdererGenesis
 
 # ca env, # ca-server and ca-client will check the following env in order, to get the home cfg path
 ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
@@ -126,6 +127,9 @@ RUN cd $FABRIC_ROOT/peer \
 RUN cd $FABRIC_ROOT/orderer \
         && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
+
+ADD crypto-config $FABRIC_CFG_PATH/
+
 
 # install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
