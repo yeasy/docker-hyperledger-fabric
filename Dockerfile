@@ -68,6 +68,7 @@ RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/production \
         $GOPATH/src/github.com/hyperledger \
         $FABRIC_CFG_PATH \
+        $FABRIC_CFG_PATH/crypto-config \
         /chaincode/input \
         /chaincode/output \
         $FABRIC_CA_SERVER_HOME \
@@ -128,7 +129,7 @@ RUN cd $FABRIC_ROOT/orderer \
         && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
-ADD crypto-config $FABRIC_CFG_PATH/
+ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
 
 # install fabric-ca
