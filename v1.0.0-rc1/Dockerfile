@@ -37,7 +37,7 @@ ENV BASEIMAGE_RELEASE 0.3.1
 # BASE_VERSION is required in core.yaml to build and run cc container
 ENV BASE_VERSION 1.0.0
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
-ENV PROJECT_VERSION 1.0.0-preview
+ENV PROJECT_VERSION 1.0.0-rc1
 # generic builder environment: builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS hyperledger
 # for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
