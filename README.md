@@ -7,11 +7,11 @@ If you want to run fabric instead of dev/compiling, please refer to [hyperledger
 # Supported tags and respective Dockerfile links
 
 * [`latest` (latest/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/Dockerfile): Tracking latest master branch code.
-* [`v1.0.0` (v1.0.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0/Dockerfile): Build for the v1.0.0 release.
-* [`v1.0.0-rc1` (v1.0.0-rc1/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-rc1/Dockerfile): Build for the v1.0.0-rc1 release.
-* [`v1.0.0-beta` (v1.0.0-beta/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-beta/Dockerfile): Build for the v1.0.0-beta release.
-* [`v1.0.0-alpha2` (v1.0.0-alpha2/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-alpha2/Dockerfile): Build for the v1.0.0-alpha2 release.
-* [`v1.0.0-alpha` (v1.0.0-alpha/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-alpha/Dockerfile): Build for the v1.0.0-alpha release.
+* [`1.0.0` (v1.0.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0/Dockerfile): Build for the 1.0.0 release.
+* [`1.0.0-rc1` (v1.0.0-rc1/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-rc1/Dockerfile): Build for the 1.0.0-rc1 release.
+* [`1.0.0-beta` (v1.0.0-beta/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-beta/Dockerfile): Build for the 1.0.0-beta release.
+* [`1.0.0-alpha2` (v1.0.0-alpha2/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-alpha2/Dockerfile): Build for the 1.0.0-alpha2 release.
+* [`1.0.0-alpha` (v1.0.0-alpha/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-alpha/Dockerfile): Build for the 1.0.0-alpha release.
 * [`0.6-dp` (0.6-dp/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/0.6-dp/Dockerfile): Use 0.6-developer-preview branch code.
 
 For more information about this image and its history, please see the relevant manifest file in the [`yeasy/docker-hyperledger-fabric` GitHub repo](https://github.com/yeasy/docker-hyperledger-fabric).
