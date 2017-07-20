@@ -134,7 +134,7 @@ ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
 # install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-    && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric-ca \
+    && git clone --single-branch -b master https://github.com/hyperledger/fabric-ca \
     && cd fabric-ca && git checkout v1.0.0 \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
