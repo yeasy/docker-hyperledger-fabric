@@ -35,9 +35,9 @@ ENV ARCH x86_64
 # version for the base images, e.g., fabric-ccenv, fabric-baseos
 ENV BASEIMAGE_RELEASE 0.3.1
 # BASE_VERSION is required in core.yaml to build and run cc container
-ENV BASE_VERSION 1.1.0
-# version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
-ENV PROJECT_VERSION 1.1.0-pre
+ENV BASE_VERSION 1.0.1
+# version for the peer/orderer binaries, the community version tracks the hash value like 1.0.1-snapshot-51b7e85
+ENV PROJECT_VERSION 1.0.1
 # generic builder environment: builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS hyperledger
 # for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
@@ -102,7 +102,8 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
+        && git clone --single-branch -b master http://gerrit.hyperledger.org/r/fabric \
+        && cd fabric && git checkout v1.0.1 \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
@@ -131,10 +132,10 @@ RUN cd $FABRIC_ROOT/orderer \
 
 ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
-
 # install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-    && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric-ca \
+    && git clone --single-branch -b master https://github.com/hyperledger/fabric-ca \
+    && cd fabric-ca && git checkout v1.0.1 \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files

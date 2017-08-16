@@ -7,6 +7,7 @@ If you want to run fabric instead of dev/compiling, please refer to [hyperledger
 # Supported tags and respective Dockerfile links
 
 * [`latest` (latest/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/Dockerfile): Tracking latest master branch code.
+* [`1.0.1` (v1.0.1/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.1/Dockerfile): Build for the 1.0.1 release.
 * [`1.0.0` (v1.0.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0/Dockerfile): Build for the 1.0.0 release.
 * [`1.0.0-rc1` (v1.0.0-rc1/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-rc1/Dockerfile): Build for the 1.0.0-rc1 release.
 * [`1.0.0-beta` (v1.0.0-beta/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.0.0-beta/Dockerfile): Build for the 1.0.0-beta release.
