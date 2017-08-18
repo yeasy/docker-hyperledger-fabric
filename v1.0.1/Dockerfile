@@ -78,7 +78,7 @@ RUN mkdir -p /var/hyperledger/db \
 
 # Install development dependencies
 RUN apt-get update \
-        && apt-get install -y apt-utils python-dev \
+        && apt-get install -y apt-utils python-dev unzip \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
         && apt-get install -y python-pip \
         && apt-get install -y vim tree \
@@ -102,8 +102,9 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b master http://gerrit.hyperledger.org/r/fabric \
-        && cd fabric && git checkout v1.0.1 \
+#&& git clone --single-branch -b master http://gerrit.hyperledger.org/r/fabric \
+        && git clone --single-branch -b master http://github.com/hyperledger/fabric \
+        && cd fabric && git checkout v${PRJECT_VERSION} \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
@@ -134,8 +135,9 @@ ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
 # install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-    && git clone --single-branch -b master https://github.com/hyperledger/fabric-ca \
-    && cd fabric-ca && git checkout v1.0.1 \
+#&& git clone --single-branch -b master https://github.com/hyperledger/fabric-ca \
+    && git clone --single-branch -b master http://github.com/hyperledger/fabric-ca \
+    && cd fabric-ca && git checkout v{PROJECT_VERSION} \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
