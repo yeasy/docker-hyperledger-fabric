@@ -105,7 +105,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 #&& git clone --single-branch -b master http://gerrit.hyperledger.org/r/fabric \
 #&& git clone --single-branch -b master https://github.com/hyperledger/fabric.git \
 #&& cd fabric && git checkout v${PRJECT_VERSION} \
-        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-v${PROJECT_VERSION} fabric \
+        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-${PROJECT_VERSION} fabric \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
@@ -139,7 +139,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 #&& git clone --single-branch -b master https://github.com/hyperledger/fabric-ca \
 #&& git clone --single-branch -b master https://github.com/hyperledger/fabric-ca.git \
 #&& cd fabric-ca && git checkout v{PROJECT_VERSION} \
-    && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-ca-v${PROJECT_VERSION} fabric-ca \
+    && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
