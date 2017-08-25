@@ -116,8 +116,7 @@ RUN cd $FABRIC_ROOT/ \
 
 # Install block-listener
 RUN cd $FABRIC_ROOT/examples/events/block-listener \
-        && go build \
-        && mv block-listener $GOPATH/bin
+        && go install
 
 # install fabric peer
 RUN cd $FABRIC_ROOT/peer \
