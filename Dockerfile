@@ -16,7 +16,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
-FROM golang:1.8
+FROM golang:1.9
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
 # fabric-peers
