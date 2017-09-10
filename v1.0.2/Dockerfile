@@ -153,6 +153,9 @@ ADD scripts/*.sh /tmp/
 # This is only a workaround for current hard-coded problem when using as fabric-baseimage.
 RUN ln -s $GOPATH /opt/gopath
 
+# Remove the go pkg files in case polluting debugging env
+RUN bash /tmp/clean_pkg.sh
+
 # temporarily fix the `go list` complain problem, which is required in chaincode packaging, see core/chaincode/platforms/golang/platform.go#GetDepoymentPayload
 ENV GOROOT=/usr/local/go
 
