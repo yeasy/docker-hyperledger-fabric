@@ -59,9 +59,9 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
               -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
               -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
 
-# peer env 
-ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric \
-    CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
+# peer envs. DONOT combine in one line as the former variable won't work on-the-fly
+ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
+ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
     CORE_LOGGING_LEVEL=DEBUG
 
 # orderer env 
