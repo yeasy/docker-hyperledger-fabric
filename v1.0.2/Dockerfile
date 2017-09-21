@@ -1,4 +1,6 @@
-# Dockerfile for Hyperledger fabric all-in-one development, including:
+# https://github.com/yeasy/docker-hyperledger-fabric
+#
+# Dockerfile for Hyperledger fabric all-in-one development and experiments, including:
 # * fabric-peer
 # * fabric-orderer
 # * fabric-ca
@@ -8,10 +10,10 @@
 # * chaintools
 # * gotools
 
-# If you need a pure peer node to run, please see the 
-# * yeasy/hyperledger-peer
-# * yeasy/hyperledger-orderer
-# * yeasy/hyperledger-ca
+# If you only need quickly deploy a fabric network, please see
+# * yeasy/hyperledger-fabric-peer
+# * yeasy/hyperledger-fabric-orderer
+# * yeasy/hyperledger-fabric-ca
 
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
@@ -19,28 +21,33 @@
 FROM golang:1.9
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
+# fabric-orderer
+EXPOSE 7050
 # fabric-peers
-EXPOSE 7050 7051
+EXPOSE 7051 7052 7053
 # fabric-ca-server RESTful
 EXPOSE 7054
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Only useful for this Dockerfile
+# Aliases only useful for this Dockerfile
 ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
+# When to become open-source?
 ENV ARCH=x86_64
 
-# version for the base images, e.g., fabric-ccenv, fabric-baseos
+# version for the hyperledger/fabric-baseimages
 ENV BASEIMAGE_RELEASE=0.3.2
-# BASE_VERSION is required in core.yaml to build and run cc container
+# BASE_VERSION is required in core.yaml to run cc container
 ENV BASE_VERSION=1.0.2
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
+# PROJECT_VERSION is required in core.yaml to build image for cc container
 ENV PROJECT_VERSION=1.0.2
 # generic builder environment: builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS=hyperledger
-# for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
+
+# for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
 ENV BASE_DOCKER_NS=hyperledger
 ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
              -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
@@ -48,7 +55,7 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
              -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
              -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
 
-# peer env 
+# peer envs. DONOT combine in one line as the former variable won't work on-the-fly
 ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
 ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
     CORE_LOGGING_LEVEL=DEBUG
@@ -58,7 +65,7 @@ ENV ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
     ORDERER_GENERAL_LISTENADDRESS=0.0.0.0 \
     ORDERER_GENERAL_GENESISPROFILE=TwoOrgsOrdererGenesis
 
-# ca env, # ca-server and ca-client will check the following env in order, to get the home cfg path
+# ca env. ca-server and ca-client will check the following env in order, to get the home cfg path
 ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
     FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server \
     FABRIC_CA_CLIENT_HOME=$HOME/.fabric-ca-client \
@@ -90,7 +97,7 @@ RUN apt-get update \
 RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.1/chaintool > /usr/local/bin/chaintool \
         && chmod a+x /usr/local/bin/chaintool
 
-# Install gotools
+# Install tools for Golang
 RUN go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/kardianos/govendor \
         && go get github.com/golang/lint/golint \
@@ -108,7 +115,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/crypto-config.yaml $FABRIC_CFG_PATH/
 
-# install configtxgen, cryptogen and configtxlator
+# Install configtxgen, cryptogen and configtxlator
 RUN cd $FABRIC_ROOT/ \
         && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "-X github.com/hyperledger/fabric/common/configtx/tool/configtxgen/metadata.Version=${PROJECT_VERSION}" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/common/tools/cryptogen/metadata.Version=${PROJECT_VERSION}" github.com/hyperledger/fabric/common/tools/cryptogen \
@@ -116,21 +123,22 @@ RUN cd $FABRIC_ROOT/ \
 
 # Install block-listener
 RUN cd $FABRIC_ROOT/examples/events/block-listener \
-        && go install
+        && go install \
+        && go clean
 
-# install fabric peer
+# Install fabric peer
 RUN cd $FABRIC_ROOT/peer \
         && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
-# install fabric orderer
+# Install fabric orderer
 RUN cd $FABRIC_ROOT/orderer \
         && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
         && go clean
 
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
-# install fabric-ca
+# Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
     && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
@@ -150,16 +158,16 @@ VOLUME $FABRIC_CA_CLIENT_HOME
 # Useful scripts for quickly compiling local code
 ADD scripts/*.sh /tmp/
 
-# This is only a workaround for current hard-coded problem when using as fabric-baseimage.
-RUN ln -s $GOPATH /opt/gopath
-
 # Remove the go pkg files in case polluting debugging env
 RUN bash /tmp/clean_pkg.sh
 
-# temporarily fix the `go list` complain problem, which is required in chaincode packaging, see core/chaincode/platforms/golang/platform.go#GetDepoymentPayload
+# Temporarily fix the `go list` complain problem, which is required in chaincode packaging, see core/chaincode/platforms/golang/platform.go#GetDepoymentPayload
 ENV GOROOT=/usr/local/go
 
 WORKDIR $FABRIC_ROOT
+
+# This is only a workaround for current hard-coded problem when using as fabric-baseimage.
+RUN ln -s $GOPATH /opt/gopath
 
 LABEL org.hyperledger.fabric.version=${PROJECT_VERSION} \
       org.hyperledger.fabric.base.version=${BASEIMAGE_RELEASE}
