@@ -38,7 +38,7 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
 ENV ARCH=x86_64
 
 # version for the hyperledger/fabric-baseimages
-ENV BASEIMAGE_RELEASE=0.4.2
+ENV BASEIMAGE_RELEASE=0.3.2
 
 # BASE_VERSION is required in core.yaml to run cc container
 ENV BASE_VERSION=1.0.3
