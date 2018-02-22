@@ -38,15 +38,13 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
 ENV ARCH=x86_64
 
 # version for the hyperledger/fabric-baseimages
-ENV BASEIMAGE_RELEASE=0.4.6
+ENV BASEIMAGE_RELEASE=0.3.2
 
 # BASE_VERSION is required in core.yaml to run cc container
-ENV BASE_VERSION=1.1.0
-
+ENV BASE_VERSION=1.0.6
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
 # PROJECT_VERSION is required in core.yaml to build image for cc container
-ENV PROJECT_VERSION=1.1.0
-
+ENV PROJECT_VERSION=1.0.6
 # generic builder environment: builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS=hyperledger
 
@@ -56,16 +54,15 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
               -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
               -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
               -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
-              -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger \
-              -X github.com/hyperledger/fabric/common/metadata.Experimental=true \
-							-linkmode external -extldflags '-static -lpthread'"
+              -X github.com/hyperledger/fabric/common/metadata.Experimental=false \
+              -linkmode external -extldflags '-static -lpthread'"
 
 # peer envs. DONOT combine in one line as the former variable won't work on-the-fly
 ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
 ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
     CORE_LOGGING_LEVEL=DEBUG
 
-# orderer env
+# orderer env 
 ENV ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
     ORDERER_GENERAL_LISTENADDRESS=0.0.0.0 \
     ORDERER_GENERAL_GENESISPROFILE=TwoOrgsOrdererGenesis
@@ -114,7 +111,7 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
+       && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-${PROJECT_VERSION} fabric \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
@@ -122,9 +119,9 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 
 # Install configtxgen, cryptogen and configtxlator
 RUN cd $FABRIC_ROOT/ \
-        && go install -tags "experimental" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/configtxgen \
-        && go install -tags "experimental" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/cryptogen \
-        && go install -tags "experimental" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/configtxlator
+        && go install -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
+        && go install -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/cryptogen \
+        && go install -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/configtxlator
 
 # Install block-listener
 RUN cd $FABRIC_ROOT/examples/events/block-listener \
@@ -145,9 +142,9 @@ RUN cd $FABRIC_ROOT/orderer \
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-    && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric-ca \
+    && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-    && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+    && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
     && cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
     && go clean
