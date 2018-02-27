@@ -117,6 +117,10 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/crypto-config.yaml $FABRIC_CFG_PATH/
 
+# temp fix incompatibility with golang 1.9.4
+RUN cd $FABRIC_ROOT \
+       && govendor fetch github.com/miekg/pkcs11
+
 # Install configtxgen, cryptogen and configtxlator
 RUN cd $FABRIC_ROOT/ \
         && go install -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/configtx/tool/configtxgen \
@@ -143,6 +147,9 @@ RUN cd $FABRIC_ROOT/orderer \
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
     && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip && unzip v${PROJECT_VERSION}.zip && rm v${PROJECT_VERSION}.zip && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
+# temp fix incompability with golang 1.9.4
+    && cd fabric-ca \
+    && govendor fetch github.com/miekg/pkcs11 \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
