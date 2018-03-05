@@ -156,6 +156,10 @@ RUN cd $GOPATH/src/github.com/hyperledger \
     && rm v${PROJECT_VERSION}.zip \
     && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
+    # temp resolve the incompatibility between golang 19.4 and old version of pkcs11 pkg
+    && cd $FABRIC_CA_ROOT \
+    && go get -u github.com/kardianos/govendor \
+    && govendor fetch github.com/miekg/pkcs11 \
     && go install -ldflags " -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
     && cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
