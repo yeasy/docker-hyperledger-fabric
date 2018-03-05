@@ -122,6 +122,10 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/crypto-config.yaml $FABRIC_CFG_PATH/
 
+# temp resolve the incompatibility between golang 19.4 and old version of pkcs11 pkg
+RUN cd $FABRIC_ROOT \
+       && govendor fetch github.com/miekg/pkcs11
+
 # Install configtxgen, cryptogen and configtxlator
 RUN cd $FABRIC_ROOT/ \
         && CGO_CFLAGS=" " go install -tags "nopkcs11" -ldflags "-X github.com/hyperledger/fabric/common/tools/configtxgen/metadata.Version=${PROJECT_VERSION}" github.com/hyperledger/fabric/common/tools/configtxgen \
