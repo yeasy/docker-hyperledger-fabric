@@ -1,5 +1,3 @@
-c https://github.com/yeasy/docker-hyperledger-fabric
-#
 # Dockerfile for Hyperledger fabric all-in-one development and experiments, including:
 # * fabric-peer
 # * fabric-orderer
