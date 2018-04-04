@@ -18,7 +18,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
-FROM golang:1.9
+FROM golang:1.10
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
 # fabric-orderer
@@ -38,7 +38,7 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
 ENV ARCH=x86_64
 
 # version for the hyperledger/fabric-baseimages
-ENV BASEIMAGE_RELEASE=0.4.6
+ENV BASEIMAGE_RELEASE=0.4.7
 
 # BASE_VERSION is required in core.yaml to run cc container
 ENV BASE_VERSION=1.1.0
