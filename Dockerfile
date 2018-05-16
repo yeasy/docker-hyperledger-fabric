@@ -30,27 +30,27 @@ EXPOSE 7054
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Aliases only useful for this Dockerfile
+# Only useful for this Dockerfile
 ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
+ENV CHAINTOOL_VERSION=1.1.1
 
-# When to become open-source?
-ENV ARCH=x86_64
+# Architecture of the node
+ENV ARCH=amd64
+# version for the base images (baseos, baseimage, ccenv, etc.), used in core.yaml as BaseVersion
+ENV BASEIMAGE_RELEASE=0.4.8
 
-# version for the hyperledger/fabric-baseimages
-ENV BASEIMAGE_RELEASE=0.4.7
-
-# BASE_VERSION is required in core.yaml to run cc container
-ENV BASE_VERSION=1.1.0
+# BASE_VERSION is required in makefile as the base release number
+ENV BASE_VERSION=1.2.0
 
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
 # PROJECT_VERSION is required in core.yaml to build image for cc container
-ENV PROJECT_VERSION=1.1.0
+ENV PROJECT_VERSION=1.2.0
 
-# generic builder environment: builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
+# generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS=hyperledger
 
-# for golang or car's baseos: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
+# for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
 ENV BASE_DOCKER_NS=hyperledger
 ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
               -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
@@ -62,6 +62,8 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
 
 # peer envs. DONOT combine in one line as the former variable won't work on-the-fly
 ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
+
+# peer env
 ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
     CORE_LOGGING_LEVEL=DEBUG
 
@@ -81,11 +83,11 @@ RUN mkdir -p /var/hyperledger/db \
         $GOPATH/src/github.com/hyperledger \
         $FABRIC_CFG_PATH \
         $FABRIC_CFG_PATH/crypto-config \
-        /chaincode/input \
-        /chaincode/output \
         $FABRIC_CA_SERVER_HOME \
         $FABRIC_CA_CLIENT_HOME \
         $CA_CFG_PATH \
+	/chaincode/input \
+        /chaincode/output \
         /var/hyperledger/fabric-ca-server
 
 # Install development dependencies
@@ -100,10 +102,10 @@ RUN apt-get update \
 
 # Install chaintool
 #RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.3/chaintool > /usr/local/bin/chaintool \
-RUN curl -fL https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/chaintool-1.0.1/hyperledger-fabric-chaintool-1.0.1.jar > /usr/local/bin/chaintool \
+RUN curl -fL https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/chaintool-${CHAINTOOL_VERSION}/hyperledger-fabric-chaintool-${CHAINTOOL_VERSION}.jar > /usr/local/bin/chaintool \
         && chmod a+x /usr/local/bin/chaintool
 
-# Install tools for Golang
+# install gotools
 RUN go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/kardianos/govendor \
         && go get github.com/golang/lint/golint \
