@@ -117,7 +117,10 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
+        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip \
+        && unzip v${PROJECT_VERSION}.zip \
+        && rm v${PROJECT_VERSION}.zip \
+        && mv fabric-${PROJECT_VERSION} fabric \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/e2e_cli/configtx.yaml $FABRIC_CFG_PATH/ \
@@ -148,7 +151,10 @@ RUN cd $FABRIC_ROOT/orderer \
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-    && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric-ca \
+    && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip \
+		&& unzip v${PROJECT_VERSION}.zip \
+		&& rm v${PROJECT_VERSION}.zip \
+		&& mv fabric-${PROJECT_VERSION} fabric \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
