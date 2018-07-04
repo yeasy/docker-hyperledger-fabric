@@ -151,10 +151,10 @@ RUN cd $FABRIC_ROOT/orderer \
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-    && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip \
-		&& unzip v${PROJECT_VERSION}.zip \
-		&& rm v${PROJECT_VERSION}.zip \
-		&& mv fabric-${PROJECT_VERSION} fabric \
+    && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip \
+    && unzip v${PROJECT_VERSION}.zip \
+    && rm v${PROJECT_VERSION}.zip \
+    && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
     && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
