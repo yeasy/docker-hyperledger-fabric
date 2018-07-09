@@ -86,7 +86,7 @@ RUN mkdir -p /var/hyperledger/db \
         $FABRIC_CA_SERVER_HOME \
         $FABRIC_CA_CLIENT_HOME \
         $CA_CFG_PATH \
-	/chaincode/input \
+        /chaincode/input \
         /chaincode/output \
         /var/hyperledger/fabric-ca-server
 
