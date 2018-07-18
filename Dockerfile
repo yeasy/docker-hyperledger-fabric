@@ -98,6 +98,7 @@ RUN apt-get update \
         && apt-get install -y vim tree jq unzip \
         && pip install --upgrade pip==9.0.1 \
         && pip install behave nose docker-compose \
+        && pip install pyinotify \
         && rm -rf /var/cache/apt
 
 # Install chaintool
