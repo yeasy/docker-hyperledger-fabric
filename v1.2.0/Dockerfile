@@ -75,7 +75,7 @@ ENV ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
 # ca env. ca-server and ca-client will check the following env in order, to get the home cfg path
 ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
     FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server \
-    FABRIC_CA_CLIENT_HOME=$HOME/.fabric-ca-client \
+    FABRIC_CA_CLIENT_HOME=/root/.fabric-ca-client \
     CA_CFG_PATH=/etc/hyperledger/fabric-ca
 
 RUN mkdir -p /var/hyperledger/db \
