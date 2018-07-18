@@ -170,7 +170,7 @@ VOLUME $FABRIC_CA_SERVER_HOME
 VOLUME $FABRIC_CA_CLIENT_HOME
 
 # Useful scripts for quickly compiling local code
-ADD scripts/*.sh /tmp/
+ADD scripts/ /tmp/
 
 # Remove the go pkg files in case polluting debugging env
 RUN bash /tmp/clean_pkg.sh
