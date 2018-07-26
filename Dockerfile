@@ -135,6 +135,9 @@ RUN cd $FABRIC_ROOT/examples/events/block-listener \
         && go install \
         && go clean
 
+# Install discover cmd
+RUN CGO_CFLAGS=" " go install -tags "experimental" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${BASE_VERSION}" github.com/hyperledger/fabric/cmd/discover
+
 # Install fabric peer
 RUN cd $FABRIC_ROOT/peer \
         && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS" \
