@@ -91,7 +91,8 @@ RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/fabric-ca-server
 
 # Install development dependencies
-RUN apt-get update \
+RUN add-apt-repository ppa:rmescandon/yq \
+        && apt-get update \
         && apt-get install -y apt-utils python-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
         && apt-get install -y python-pip \
