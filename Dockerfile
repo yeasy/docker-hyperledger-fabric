@@ -91,15 +91,15 @@ RUN mkdir -p /var/hyperledger/db \
         /var/hyperledger/fabric-ca-server
 
 # Install development dependencies
-RUN add-apt-repository ppa:rmescandon/yq \
-        && apt-get update \
+RUN apt-get update \
         && apt-get install -y apt-utils python-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
         && apt-get install -y python-pip \
-        && apt-get install -y vim tree jq yq unzip \
+        && apt-get install -y vim tree jq unzip \
         && pip install --upgrade pip==9.0.1 \
         && pip install behave nose docker-compose \
         && pip install pyinotify \
+        && pip install yq \
         && rm -rf /var/cache/apt
 
 # Install chaintool
