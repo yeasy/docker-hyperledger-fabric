@@ -99,8 +99,11 @@ RUN apt-get update \
         && pip install --upgrade pip==9.0.1 \
         && pip install behave nose docker-compose \
         && pip install pyinotify \
-        && pip install yq \
         && rm -rf /var/cache/apt
+
+# Install yq to update config
+RUN go get gopkg.in/mikefarah/yq.v2 \
+        && ln -s $GOPATH/bin/yq.v2 /usr/local/bin/yq
 
 # Install chaintool
 #RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.3/chaintool > /usr/local/bin/chaintool \
