@@ -18,7 +18,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
-FROM golang:1.10
+FROM golang:1.11
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
 # fabric-orderer
@@ -38,7 +38,7 @@ ENV CHAINTOOL_RELEASE=1.1.2
 # Architecture of the node
 ENV ARCH=amd64
 # version for the base images (baseos, baseimage, ccenv, etc.), used in core.yaml as BaseVersion
-ENV BASEIMAGE_RELEASE=0.4.13
+ENV BASEIMAGE_RELEASE=0.4.14
 
 # BASE_VERSION is required in makefile as the base release number
 ENV BASE_VERSION=1.4.0
