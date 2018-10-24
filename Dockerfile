@@ -116,7 +116,7 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/axw/gocov/... \
         && go get github.com/AlekSi/gocov-xml \
         && go get golang.org/x/tools/cmd/goimports \
-        && go get go get -u golang.org/x/lint/golint \
+        && go get golang.org/x/lint/golint \
         && go get github.com/estesp/manifest-tool \
         && go get github.com/client9/misspell/cmd/misspell \
         && go get github.com/estesp/manifest-tool \
