@@ -139,7 +139,7 @@ RUN cd $FABRIC_ROOT/ \
     && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/common/tools/idemixgen
 
 # Install fabric peer
-RUN cd $FABRIC_ROOT/peer \
+RUN cd $FABRIC_ROOT/cmd/peer \
     && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" \
     && go clean
 
