@@ -144,7 +144,7 @@ RUN cd $FABRIC_ROOT/cmd/peer \
     && go clean
 
 # Install fabric orderer
-RUN cd $FABRIC_ROOT/orderer \
+RUN cd $FABRIC_ROOT/orderer/common/server \
     && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" \
     && go clean
 
