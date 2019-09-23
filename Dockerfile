@@ -136,7 +136,7 @@ RUN cd $FABRIC_ROOT/ \
     && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxlator \
     && CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=2.0.0" github.com/hyperledger/fabric/cmd/discover \
 #&& CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/token/metadata.Version=2.0.0" github.com/hyperledger/fabric/cmd/token \
-    && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/common/tools/idemixgen
+    && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/idemixgen
 
 # Install fabric peer
 RUN cd $FABRIC_ROOT/cmd/peer \
