@@ -144,8 +144,7 @@ RUN cd $FABRIC_ROOT/cmd/peer \
     && go clean
 
 # Install fabric orderer
-RUN cd $FABRIC_ROOT/orderer/common/server \
-    && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" \
+RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/orderer \
     && go clean
 
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
