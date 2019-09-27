@@ -8,6 +8,6 @@ echo "Remove $ORDERER_BIN"
 rm -f $ORDERER_BIN
 
 echo "Building fabric orderer"
-cd $FABRIC_ROOT/orderer \
-    && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS -linkmode external -extldflags '-static -lpthread'" \
+cd $FABRIC_ROOT/cmd/orderer \
+    && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" \
     && go clean
