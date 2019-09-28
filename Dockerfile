@@ -18,7 +18,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
-FROM golang:1.13
+FROM golang:1.12
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
 # fabric-orderer
@@ -128,6 +128,10 @@ RUN cd $GOPATH/src/github.com/hyperledger \
     && echo "*                hard    nofile          10000" >> /etc/security/limits.conf \
     && echo "*                soft    nofile          10000" >> /etc/security/limits.conf \
     && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
+
+# Add external farbric chaincode dependencies
+RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
+    && go get github.com/hyperledger/fabric-protos-go/peer
 
 # install configtxgen, cryptogen, configtxlator, discover, token and idemixgen
 RUN cd $FABRIC_ROOT/ \
