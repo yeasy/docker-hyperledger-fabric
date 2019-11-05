@@ -18,7 +18,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
-FROM golang:1.12
+FROM golang:1.13
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
 # fabric-orderer
@@ -101,9 +101,9 @@ RUN apt-get update \
     && pip install pyinotify \
     && rm -rf /var/cache/apt
 
-# Install yq to update config
-RUN go get gopkg.in/yaml.v2 \
-    && ln -s $GOPATH/bin/yq.v2 /usr/local/bin/yq
+# Install yq to update config for fabric-ca
+RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 \
+    && chmod a+x /go/bin/yq
 
 # Install chaintool
 #RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.3/chaintool > /usr/local/bin/chaintool \
