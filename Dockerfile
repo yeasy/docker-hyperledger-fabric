@@ -102,7 +102,7 @@ RUN apt-get update \
     && rm -rf /var/cache/apt
 
 # Install yq to update config
-RUN go get gopkg.in/mikefarah/yq.v2 \
+RUN go get gopkg.in/yaml.v2 \
     && ln -s $GOPATH/bin/yq.v2 /usr/local/bin/yq
 
 # Install chaintool
