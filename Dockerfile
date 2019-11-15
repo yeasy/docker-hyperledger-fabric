@@ -38,7 +38,7 @@ ENV CHAINTOOL_RELEASE=1.1.2
 # Architecture of the node
 ENV ARCH=amd64
 # version for the base images (baseos, baseimage, ccenv, etc.), used in core.yaml as BaseVersion
-ENV BASEIMAGE_RELEASE=0.4.16
+ENV BASEIMAGE_RELEASE=0.4.18
 
 # BASE_VERSION is used in metadata.Version as major version
 ENV BASE_VERSION=2.0.0
