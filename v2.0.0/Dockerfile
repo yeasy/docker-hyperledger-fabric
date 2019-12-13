@@ -57,7 +57,7 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
 # -X github.com/hyperledger/fabric/common/metadata.Experimental=true \
 # -linkmode external -extldflags '-static -lpthread'"
 
-# Peer config path
+# peer envs. DONOT combine in one line as the former variable won't work on-the-fly
 ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
 
 # peer env
@@ -119,9 +119,10 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
-        && echo "*                hard    nofile          10000" >> /etc/security/limits.conf \
-        && echo "*                soft    nofile          10000" >> /etc/security/limits.conf \
+        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}-beta.zip \
+        && unzip v${PROJECT_VERSION}-beta.zip \
+        && rm v${PROJECT_VERSION}-beta.zip \
+        && mv fabric-${PROJECT_VERSION}-beta fabric \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
 # Add external farbric chaincode dependencies
@@ -149,9 +150,12 @@ RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledg
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric-ca \
-        # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+    && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}-beta.zip \
+    && unzip v${PROJECT_VERSION}-beta.zip \
+    && rm v${PROJECT_VERSION}-beta.zip \
+    && mv fabric-ca-${PROJECT_VERSION}-beta fabric-ca \
+    # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
+    && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
         && go clean
