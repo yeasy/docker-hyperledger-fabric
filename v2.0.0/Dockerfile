@@ -21,9 +21,8 @@
 FROM golang:1.13
 LABEL maintainer "Baohua Yang <yeasy.github.com>"
 
-EXPOSE 7050 # Orderer
-EXPOSE 7051  # Peer
-EXPOSE 7054  # CA
+# Orderer, peer, ca, operation api
+EXPOSE 7050 7051 7054 8443 9443
 
 ENV DEBIAN_FRONTEND noninteractive
 
