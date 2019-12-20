@@ -31,9 +31,7 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 ENV CHAINTOOL_RELEASE=1.1.3
 
-# Architecture of the node
-ENV ARCH=amd64
-# version for the base images (baseos, baseimage, ccenv, etc.), used in core.yaml as BaseVersion
+# version for the base images (baseos, baseimage, ccenv, etc.)
 ENV BASEIMAGE_RELEASE=0.4.18
 
 # BASE_VERSION is used in metadata.Version as major version
@@ -42,13 +40,12 @@ ENV BASE_VERSION=2.0.0
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
 ENV PROJECT_VERSION=2.0.0
 
-# generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
+# generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(PROJECT_VERSION)
 ENV DOCKER_NS=hyperledger
 
-# for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
+# for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(BASEIMAGE_RELEASE)
 ENV BASE_DOCKER_NS=hyperledger
 ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-              -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
               -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
               -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
               -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
