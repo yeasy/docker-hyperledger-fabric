@@ -145,13 +145,13 @@ RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledg
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
 # Install fabric-ca
-RUN cd $GOPATH/src/github.com/hyperledger \
-    && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}-beta.zip \
-    && unzip v${PROJECT_VERSION}-beta.zip \
-    && rm v${PROJECT_VERSION}-beta.zip \
-    && mv fabric-ca-${PROJECT_VERSION}-beta fabric-ca \
-    # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-    && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+RUN PROJECT_VERSION=1.4.4 cd $GOPATH/src/github.com/hyperledger \
+        && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip \
+        && unzip v${PROJECT_VERSION}.zip \
+        && rm v${PROJECT_VERSION}.zip \
+        && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
+# This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
+        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
         && go clean
