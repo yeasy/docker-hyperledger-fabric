@@ -135,7 +135,7 @@ RUN cd $FABRIC_ROOT/ \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/idemixgen
 
 # Install fabric peer
-RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/orderer \
+RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/peer \
         && go clean
 
 # Install fabric orderer
