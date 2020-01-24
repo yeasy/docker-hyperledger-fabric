@@ -115,7 +115,7 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b master --depth 1 http://gerrit.hyperledger.org/r/fabric \
+        && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric.git \
         && echo "*                hard    nofile          10000" >> /etc/security/limits.conf \
         && echo "*                soft    nofile          10000" >> /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
