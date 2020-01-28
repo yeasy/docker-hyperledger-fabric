@@ -40,8 +40,9 @@ ENV BASE_VERSION=2.0.0
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
 ENV PROJECT_VERSION=2.0.0
 
-# generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(PROJECT_VERSION)
+# generic environment (core.yaml) for builder and runtime: builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION)
 ENV DOCKER_NS=hyperledger
+ENV TWO_DIGIT_VERSION=2.0
 
 # for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(BASEIMAGE_RELEASE)
 ENV BASE_DOCKER_NS=hyperledger
