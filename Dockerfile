@@ -54,7 +54,7 @@ ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT
 # -X github.com/hyperledger/fabric/common/metadata.Experimental=true \
 # -linkmode external -extldflags '-static -lpthread'"
 
-# Peer config path
+# peer envs. DONOT combine in one line as the former variable won't work on-the-fly
 ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
 
 # peer env
@@ -117,8 +117,8 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric.git \
-        && echo "*                hard    nofile          10000" >> /etc/security/limits.conf \
-        && echo "*                soft    nofile          10000" >> /etc/security/limits.conf \
+        && echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
+        && echo "*                soft    nofile          8192" >> /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
 # Add external farbric chaincode dependencies

@@ -120,6 +120,8 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && unzip v${PROJECT_VERSION}.zip \
         && rm v${PROJECT_VERSION}.zip \
         && mv fabric-${PROJECT_VERSION} fabric \
+	&& echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
+        && echo "*                soft    nofile          8192" >> /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
 # Add external farbric chaincode dependencies
