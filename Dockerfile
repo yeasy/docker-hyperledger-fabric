@@ -7,7 +7,6 @@
 # * cryptogen
 # * configtxgen
 # * configtxlator
-# * chaintools
 # * gotools
 
 # If you only need quickly deploy a fabric network, please see
@@ -29,7 +28,6 @@ ENV DEBIAN_FRONTEND noninteractive
 # Only useful for this Dockerfile
 ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
-ENV CHAINTOOL_RELEASE=1.1.3
 
 # version for the base images (baseos, baseimage, ccenv, etc.)
 ENV BASEIMAGE_RELEASE=0.4.18
@@ -96,11 +94,6 @@ RUN apt-get update \
 # Install yq to update config for fabric-ca
 RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 \
         && chmod a+x /go/bin/yq
-
-# Install chaintool
-#RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.3/chaintool > /usr/local/bin/chaintool \
-RUN curl -fL https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/chaintool-${CHAINTOOL_RELEASE}/hyperledger-fabric-chaintool-${CHAINTOOL_RELEASE}.jar > /usr/local/bin/chaintool \
-        && chmod a+x /usr/local/bin/chaintool
 
 # install gotools
 RUN go get github.com/golang/protobuf/protoc-gen-go \
