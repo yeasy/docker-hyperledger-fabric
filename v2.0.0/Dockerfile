@@ -61,14 +61,14 @@ ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
 
 # orderer env
 ENV ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
-                                ORDERER_GENERAL_LISTENADDRESS=0.0.0.0 \
-                                ORDERER_GENERAL_GENESISPROFILE=TwoOrgsOrdererGenesis
+    ORDERER_GENERAL_LISTENADDRESS=0.0.0.0 \
+    ORDERER_GENERAL_GENESISPROFILE=TwoOrgsOrdererGenesis
 
 # ca env. ca-server and ca-client will check the following env in order, to get the home cfg path
 ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
-   FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server \
-   FABRIC_CA_CLIENT_HOME=/root/.fabric-ca-client \
-   CA_CFG_PATH=/etc/hyperledger/fabric-ca
+    FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server \
+    FABRIC_CA_CLIENT_HOME=/root/.fabric-ca-client \
+    CA_CFG_PATH=/etc/hyperledger/fabric-ca
 
 RUN mkdir -p /var/hyperledger/production \
         $GOPATH/src/github.com/hyperledger \
@@ -117,7 +117,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && echo "*                soft    nofile          8192" >> /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
-# Add external farbric chaincode dependencies
+# Add external fabric chaincode dependencies
 RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
         && go get github.com/hyperledger/fabric-protos-go/peer
 
@@ -127,7 +127,6 @@ RUN cd $FABRIC_ROOT/ \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/cryptogen \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxlator \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=2.0.0" github.com/hyperledger/fabric/cmd/discover \
-#&& CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/token/metadata.Version=2.0.0" github.com/hyperledger/fabric/cmd/token \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/idemixgen
 
 # Install fabric peer
