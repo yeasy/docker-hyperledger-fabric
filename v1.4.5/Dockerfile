@@ -108,8 +108,7 @@ RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/y
     && chmod a+x /go/bin/yq
 
 # Install chaintool
-#RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.3/chaintool > /usr/local/bin/chaintool \
-RUN curl -fL https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/chaintool-${CHAINTOOL_RELEASE}/hyperledger-fabric-chaintool-${CHAINTOOL_RELEASE}.jar > /usr/local/bin/chaintool \
+RUN curl -fL https://hyperledger.jfrog.io/hyperledger/fabric-maven/org/hyperledger/fabric-chaintool/$(CHAINTOOL_RELEASE)/fabric-chaintool-$(CHAINTOOL_RELEASE).jar > /usr/local/bin/chaintool \
         && chmod a+x /usr/local/bin/chaintool
 
 # install gotools
