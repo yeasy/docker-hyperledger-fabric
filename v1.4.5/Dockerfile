@@ -7,6 +7,7 @@
 # * cryptogen
 # * configtxgen
 # * configtxlator
+# * chaintools
 # * gotools
 
 # If you only need quickly deploy a fabric network, please see
@@ -17,7 +18,8 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
-FROM golang:1.11
+
+FROM golang:1.12
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
 # fabric-orderer
@@ -32,31 +34,33 @@ ENV DEBIAN_FRONTEND noninteractive
 # Only useful for this Dockerfile
 ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
+ENV CHAINTOOL_RELEASE=1.1.3
 
 # Architecture of the node
 ENV ARCH=amd64
 # version for the base images (baseos, baseimage, ccenv, etc.), used in core.yaml as BaseVersion
-ENV BASEIMAGE_RELEASE=0.4.14
+ENV BASEIMAGE_RELEASE=0.4.18
 
 # BASE_VERSION is required in makefile as the base release number
-ENV BASE_VERSION=1.4.1
+ENV BASE_VERSION=1.4.5
 
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
 # PROJECT_VERSION is required in core.yaml to build image for cc container
-ENV PROJECT_VERSION=1.4.1
+ENV PROJECT_VERSION=1.4.5
 
 # generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS=hyperledger
 
 # for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
 ENV BASE_DOCKER_NS=hyperledger
-ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-              -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
-              -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
-              -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
-              -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger \
-              -X github.com/hyperledger/fabric/common/metadata.Experimental=true \
-							-linkmode external -extldflags '-static -lpthread'"
+ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${BASE_VERSION} \
+             -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
+             -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
+             -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
+             -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
+
+# -X github.com/hyperledger/fabric/common/metadata.Experimental=true \
+# -linkmode external -extldflags '-static -lpthread'"
 
 # peer envs. DONOT combine in one line as the former variable won't work on-the-fly
 ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
@@ -94,6 +98,7 @@ RUN apt-get update \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
         && apt-get install -y python-pip \
         && apt-get install -y vim tree jq unzip \
+#&& pip install --upgrade pip==9.0.1 \
         && pip install behave nose docker-compose \
         && pip install pyinotify \
         && rm -rf /var/cache/apt
@@ -101,6 +106,11 @@ RUN apt-get update \
 # Install yq to update config
 RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 \
     && chmod a+x /go/bin/yq
+
+# Install chaintool
+#RUN curl -L https://github.com/hyperledger/fabric-chaintool/releases/download/v0.10.3/chaintool > /usr/local/bin/chaintool \
+RUN curl -fL https://nexus.hyperledger.org/content/repositories/releases/org/hyperledger/fabric/hyperledger-fabric/chaintool-${CHAINTOOL_RELEASE}/hyperledger-fabric-chaintool-${CHAINTOOL_RELEASE}.jar > /usr/local/bin/chaintool \
+        && chmod a+x /usr/local/bin/chaintool
 
 # install gotools
 RUN go get github.com/golang/protobuf/protoc-gen-go \
@@ -127,9 +137,9 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 
 # Install configtxgen, cryptogen and configtxlator
 RUN cd $FABRIC_ROOT/ \
-        && go install -tags "experimental" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/configtxgen \
-        && go install -tags "experimental" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/cryptogen \
-        && go install -tags "experimental" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/configtxlator
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "" github.com/hyperledger/fabric/common/tools/configtxgen \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "" github.com/hyperledger/fabric/common/tools/cryptogen \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "" github.com/hyperledger/fabric/common/tools/configtxlator
 
 # Install eventsclient
 RUN cd $FABRIC_ROOT/examples/events/eventsclient \
@@ -137,7 +147,7 @@ RUN cd $FABRIC_ROOT/examples/events/eventsclient \
         && go clean
 
 # Install discover cmd
-RUN CGO_CFLAGS=" " go install -tags "experimental" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${BASE_VERSION}" github.com/hyperledger/fabric/cmd/discover
+RUN CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${BASE_VERSION}" github.com/hyperledger/fabric/cmd/discover
 
 # Install fabric peer
 RUN cd $FABRIC_ROOT/peer \

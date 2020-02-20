@@ -131,11 +131,11 @@ RUN cd $FABRIC_ROOT/examples/events/eventsclient \
         && go clean
 
 # Install fabric peer
-RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/peer \
+RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/peer \
         && go clean
 
 # Install fabric orderer
-RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/orderer \
+RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/orderer \
         && go clean
 
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
