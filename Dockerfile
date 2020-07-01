@@ -17,7 +17,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/production
 
-FROM golang:1.13
+FROM golang:1.14
 LABEL maintainer "Baohua Yang <yeasy.github.com>"
 
 # Orderer, peer, ca, operation api
@@ -33,14 +33,14 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
 ENV BASEIMAGE_RELEASE=0.4.18
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=2.0.0
+ENV BASE_VERSION=2.2.0
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=2.0.0
+ENV PROJECT_VERSION=2.2.0
 
 # generic environment (core.yaml) for builder and runtime: builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION)
 ENV DOCKER_NS=hyperledger
-ENV TWO_DIGIT_VERSION=2.0
+ENV TWO_DIGIT_VERSION=2.2
 
 # for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(BASEIMAGE_RELEASE)
 ENV BASE_DOCKER_NS=hyperledger
@@ -123,7 +123,7 @@ RUN cd $FABRIC_ROOT/ \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxgen \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/cryptogen \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxlator \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=2.0.0" github.com/hyperledger/fabric/cmd/discover \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${PROJECT_VERSION}" github.com/hyperledger/fabric/cmd/discover \
         && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/idemixgen
 
 # Install fabric peer
