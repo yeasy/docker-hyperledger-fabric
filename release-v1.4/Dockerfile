@@ -32,7 +32,7 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
 # Architecture of the node
 ENV ARCH=amd64
 # version for the base images (baseos, baseimage, ccenv, etc.)
-ENV BASEIMAGE_RELEASE=0.4.20
+ENV BASEIMAGE_RELEASE=0.4.21
 
 # BASE_VERSION is used in metadata.Version as major version
 ENV BASE_VERSION=1.4.7

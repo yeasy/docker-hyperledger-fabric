@@ -30,7 +30,7 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
 # version for the base images (baseos, baseimage, ccenv, etc.)
-ENV BASEIMAGE_RELEASE=0.4.18
+ENV BASEIMAGE_RELEASE=0.4.21
 
 # BASE_VERSION is used in metadata.Version as major version
 ENV BASE_VERSION=2.2.0
