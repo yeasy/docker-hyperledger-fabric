@@ -9,6 +9,27 @@
 # HLF_NODE_PEER_CONFIG: store a base64 encoded zipped peer configuration file (core.yaml)
 # HLF_NODE_ORDERER_CONFIG: store a base64 encoded zipped orderer configuration file (orderer.yaml)
 
+
+# storeFile will read the variable with given name, and store its data under the given path
+# $1: variable-name to decode and then unzip, e.g., HLF_NODE_MSP
+# $2: path to put the result under, e.g., $cfg_path
+function storeFile {
+    name="$1"
+    path="$2"
+    value="${!name}" # get the data that stored in the env variable
+    if [[ -z "${value}" || -z "${path}" ]]; then
+        echo "Parameter ${name} or ${path} is empty or undefined"
+        return
+    else
+	echo "Store data in ${name} to ${path}"
+        echo "${value}" | base64 -d > /tmp/1.zip
+        unzip -o -d ${path} /tmp/1.zip
+        rm /tmp/1.zip
+        ls ${path}
+    fi
+}
+
+
 # The optional cmd to run after storing every file
 cmd=$1
 
@@ -16,29 +37,17 @@ cmd=$1
 cfg_path=${FABRIC_CFG_PATH:-/etc/hyperledger/fabric}
 
 # Read each file from env and store under the ${cfg_path}
-for name in ${HLF_NODE_MSP} ${HLF_NODE_TLS} ${HLF_NODE_BOOTSTRAP_BLOCK} ${HLF_NODE_PEER_CONFIG} ${HLF_NODE_ORDERER_CONFIG}
+for name in HLF_NODE_MSP \
+	HLF_NODE_TLS \
+	HLF_NODE_BOOTSTRAP_BLOCK \
+	HLF_NODE_PEER_CONFIG \
+	HLF_NODE_ORDERER_CONFIG
 do
-    echo "Store ${name}"
-	storeFile $name
+    storeFile ${name} ${cfg_path}
 done
 
 # Run optional cmd
-if [[ -z "${cmd}" ]]; then
+if [[ ! -z "${cmd}" ]]; then
     echo "Run ${cmd}"
     ${cmd}
 fi
-
-# variable-name to decode and then unzip to ${cfg_path}
-function storeFile {
-    if [[ -z "$1" ]]; then
-        echo "The variable is undefined"
-        return
-    else
-        echo "$1" | base64 -d > /tmp/1.zip
-        unzip -o -d $2 /tmp/1.zip
-        rm /tmp/1.zip
-        ls $cfg_path
-    fi
-}
-
-
