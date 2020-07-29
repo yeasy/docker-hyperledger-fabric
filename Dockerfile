@@ -34,6 +34,7 @@ ENV BASE_VERSION=2.2.0
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
 ENV PROJECT_VERSION=2.2.0
+ENV HLF_CA_VERSION=1.4.7
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger
@@ -136,7 +137,7 @@ RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledg
 RUN cd $GOPATH/src/github.com/hyperledger \
         && git clone --single-branch -b master --depth 1 https://github.com/hyperledger/fabric-ca.git \
         # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=${HLF_CA_VERSION} -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
         && go clean

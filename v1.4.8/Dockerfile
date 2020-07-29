@@ -47,6 +47,7 @@ ENV BASE_VERSION=1.4.8
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
 # PROJECT_VERSION is required in core.yaml to build image for cc container
 ENV PROJECT_VERSION=1.4.8
+ENV HLF_CA_VERSION=1.4.7
 ENV TWO_DIGIT_VERSION=1.4
 
 # generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
@@ -163,12 +164,12 @@ RUN cd $FABRIC_ROOT/orderer \
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-    && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip \
-    && unzip v${PROJECT_VERSION}.zip \
-    && rm v${PROJECT_VERSION}.zip \
-    && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
+    && wget https://github.com/hyperledger/fabric-ca/archive/v${HLF_CA_VERSION}.zip \
+    && unzip v${HLF_CA_VERSION}.zip \
+    && rm v${HLF_CA_VERSION}.zip \
+    && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
     # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-    && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+    && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$HLF_CA_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
     # Copy example ca and key files
     && cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
     && go clean

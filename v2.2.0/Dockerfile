@@ -34,6 +34,7 @@ ENV BASE_VERSION=2.2.0
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
 ENV PROJECT_VERSION=2.2.0
+ENV HLF_CA_VERSION=1.4.7
 
 # generic environment (core.yaml) for builder and runtime: builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION)
 ENV DOCKER_NS=hyperledger
@@ -137,16 +138,14 @@ RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledg
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && export PROJECT_VERSION=1.4.7 \
-        && wget https://github.com/hyperledger/fabric-ca/archive/v${PROJECT_VERSION}.zip \
-        && unzip v${PROJECT_VERSION}.zip \
-        && rm v${PROJECT_VERSION}.zip \
-        && mv fabric-ca-${PROJECT_VERSION} fabric-ca \
+        && wget https://github.com/hyperledger/fabric-ca/archive/v${HLF_CA_VERSION}.zip \
+        && unzip v${HLF_CA_VERSION}.zip \
+        && rm v${HLF_CA_VERSION}.zip \
+        && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
 # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
         && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
-        && export PROJECT_VERSION=2.2.0 \
         && go clean
 
 # This is useful to debug local code with mapping inside
