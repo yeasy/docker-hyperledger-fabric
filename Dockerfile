@@ -30,11 +30,11 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=2.2.0
+ENV BASE_VERSION=2.2.1
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=2.2.0
-ENV HLF_CA_VERSION=1.4.7
+ENV PROJECT_VERSION=2.2.1
+ENV HLF_CA_VERSION=1.4.9
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger
@@ -80,12 +80,12 @@ RUN mkdir -p /var/hyperledger/production \
 
 # Install development dependencies
 RUN apt-get update \
-        && apt-get install -y apt-utils python-dev \
+        && apt-get install -y apt-utils python3-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
-        && apt-get install -y python-pip \
+        && apt-get install -y python3-pip \
         && apt-get install -y vim tree jq unzip \
-        && pip install behave nose docker-compose \
-        && pip install pyinotify \
+        && pip3 install behave nose docker-compose \
+        && pip3 install pyinotify \
         && rm -rf /var/cache/apt
 
 # Install yq to update config for fabric-ca

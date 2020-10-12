@@ -79,12 +79,12 @@ RUN mkdir -p /var/hyperledger/production \
 
 # Install development dependencies
 RUN apt-get update \
-        && apt-get install -y apt-utils python-dev \
+        && apt-get install -y apt-utils python3-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
-        && apt-get install -y python-pip \
+        && apt-get install -y python3-pip \
         && apt-get install -y vim tree jq unzip \
-        && pip install behave nose docker-compose \
-        && pip install pyinotify \
+        && pip3 install behave nose docker-compose \
+        && pip3 install pyinotify \
         && rm -rf /var/cache/apt
 
 # Install yq to update config for fabric-ca

@@ -35,11 +35,11 @@ ENV ARCH=amd64
 ENV BASEIMAGE_RELEASE=0.4.21
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=1.4.8
+ENV BASE_VERSION=1.4.9
 
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=1.4.8
+ENV PROJECT_VERSION=1.4.9
 ENV TWO_DIGIT_VERSION=1.4
 
 # generic environment (core.yaml) for builder and runtime: builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION)
@@ -87,12 +87,12 @@ RUN mkdir -p /var/hyperledger/production \
 
 # Install development dependencies
 RUN apt-get update \
-        && apt-get install -y apt-utils python-dev \
+        && apt-get install -y apt-utils python3-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
-        && apt-get install -y python-pip \
+        && apt-get install -y python3-pip \
         && apt-get install -y vim tree jq unzip \
-        && pip install behave nose docker-compose \
-        && pip install pyinotify \
+        && pip3 install behave nose docker-compose \
+        && pip3 install pyinotify \
         && rm -rf /var/cache/apt
 
 # Install yq to update config for fabric-ca
