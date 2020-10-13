@@ -47,7 +47,7 @@ ENV BASE_VERSION=1.4.9
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
 # PROJECT_VERSION is required in core.yaml to build image for cc container
 ENV PROJECT_VERSION=1.4.9
-ENV HLF_CA_VERSION=1.4.7
+ENV HLF_CA_VERSION=1.4.9
 ENV TWO_DIGIT_VERSION=1.4
 
 # generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
@@ -96,13 +96,12 @@ RUN mkdir -p /var/hyperledger/db \
 
 # Install development dependencies
 RUN apt-get update \
-        && apt-get install -y apt-utils python-dev \
+        && apt-get install -y apt-utils python3-dev \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
-        && apt-get install -y python-pip \
+        && apt-get install -y python3-pip \
         && apt-get install -y vim tree jq unzip \
 #&& pip install --upgrade pip==9.0.1 \
-        && pip install behave nose docker-compose \
-        && pip install pyinotify \
+        && pip3 install behave nose docker-compose pyinotify \
         && rm -rf /var/cache/apt
 
 # Install yq to update config
