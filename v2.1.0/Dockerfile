@@ -102,9 +102,8 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/AlekSi/gocov-xml \
         && go get golang.org/x/tools/cmd/goimports \
         && go get golang.org/x/lint/golint \
-        && go get github.com/estesp/manifest-tool \
+        && go get github.com/estesp/manifest-tool/... \
         && go get github.com/client9/misspell/cmd/misspell \
-        && go get github.com/estesp/manifest-tool \
         && go get github.com/onsi/ginkgo/ginkgo
 
 # Clone the Hyperledger Fabric code and cp sample config files
@@ -150,7 +149,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
-        && export PROJECT_VERSION=2.2.0 \
+        && export PROJECT_VERSION=2.1.0 \
         && go clean
 
 # This is useful to debug local code with mapping inside
