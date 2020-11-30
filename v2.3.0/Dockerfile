@@ -7,6 +7,8 @@
 # * cryptogen
 # * configtxgen
 # * configtxlator
+# * idemixgen
+# * osnadmin
 # * gotools
 
 # If you only need quickly deploy a fabric network, please see
@@ -92,7 +94,7 @@ RUN apt-get update \
 RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 \
         && chmod a+x /go/bin/yq
 
-# install gotools
+# Install gotools
 RUN go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/maxbrunsfeld/counterfeiter \
         && go get github.com/axw/gocov/... \
@@ -109,7 +111,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && unzip v${PROJECT_VERSION}.zip \
         && rm v${PROJECT_VERSION}.zip \
         && mv fabric-${PROJECT_VERSION} fabric \
-	&& echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
+        && echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
         && echo "*                soft    nofile          8192" >> /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
@@ -117,13 +119,15 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
         && go get github.com/hyperledger/fabric-protos-go/peer
 
-# Install configtxgen, cryptogen, configtxlator, discover and idemixgen
+# Install configtxgen, cryptogen, configtxlator, discover, idemixgen and osnadmin
 RUN cd $FABRIC_ROOT/ \
-        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxgen \
-        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/cryptogen \
-        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxlator \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${PROJECT_VERSION}" github.com/hyperledger/fabric/cmd/discover \
-        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/idemixgen
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxgen \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/cryptogen \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxlator \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" -ldflags github.com/hyperledger/fabric/cmd/discover \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/idemixgen \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/osnadmin
+
 
 # Install fabric peer
 RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/peer \
@@ -142,7 +146,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && rm v${HLF_CA_VERSION}.zip \
         && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
 # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=${HLF_CA_VERSION} -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
         && go clean
