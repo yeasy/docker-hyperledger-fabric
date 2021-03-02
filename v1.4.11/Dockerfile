@@ -7,6 +7,7 @@
 # * cryptogen
 # * configtxgen
 # * configtxlator
+# * chaintools
 # * gotools
 
 # If you only need quickly deploy a fabric network, please see
@@ -15,43 +16,50 @@
 # * yeasy/hyperledger-fabric-ca
 
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
-# Data is stored under /var/hyperledger/production
+# Data is stored under /var/hyperledger/db and /var/hyperledger/production
 
-FROM golang:1.13
+
+FROM golang:1.14
 LABEL maintainer "Baohua Yang <yangbaohua@gmail.com>"
 
-# Orderer, peer, ca, operation api
-EXPOSE 7050 7051 7054 8443 9443
+# fabric-orderer
+EXPOSE 7050
+# fabric-peers
+EXPOSE 7051 7052 7053
+# fabric-ca-server RESTful
+EXPOSE 7054
 
 ENV DEBIAN_FRONTEND noninteractive
 
 # Only useful for this Dockerfile
 ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
+ENV CHAINTOOL_RELEASE=1.1.3
 
 # Architecture of the node
 ENV ARCH=amd64
-# version for the base images (baseos, baseimage, ccenv, etc.)
+# version for the base images (baseos, baseimage, ccenv, etc.), used in core.yaml as BaseVersion
 ENV BASEIMAGE_RELEASE=0.4.22
 
-# BASE_VERSION is used in metadata.Version as major version
+# BASE_VERSION is required in makefile as the base release number
 ENV BASE_VERSION=1.4.11
 
 # version for the peer/orderer binaries, the community version tracks the hash value like 1.0.0-snapshot-51b7e85
-# PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
+# PROJECT_VERSION is required in core.yaml to build image for cc container
 ENV PROJECT_VERSION=1.4.11
+ENV HLF_CA_VERSION=1.4.9
 ENV TWO_DIGIT_VERSION=1.4
 
-# generic environment (core.yaml) for builder and runtime: builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION)
+# generic golang cc builder environment (core.yaml): builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 ENV DOCKER_NS=hyperledger
 
-# for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(BASEIMAGE_RELEASE)
+# for golang or car's baseos for cc runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASEIMAGE_RELEASE)
 ENV BASE_DOCKER_NS=hyperledger
-ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
-              -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
-              -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
-              -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
-              -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
+ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${BASE_VERSION} \
+             -X github.com/hyperledger/fabric/common/metadata.BaseVersion=${BASEIMAGE_RELEASE} \
+             -X github.com/hyperledger/fabric/common/metadata.BaseDockerLabel=org.hyperledger.fabric \
+             -X github.com/hyperledger/fabric/common/metadata.DockerNamespace=hyperledger \
+             -X github.com/hyperledger/fabric/common/metadata.BaseDockerNamespace=hyperledger"
 
 # -X github.com/hyperledger/fabric/common/metadata.Experimental=true \
 # -linkmode external -extldflags '-static -lpthread'"
@@ -61,7 +69,7 @@ ENV FABRIC_CFG_PATH=/etc/hyperledger/fabric
 
 # peer env
 ENV CORE_PEER_MSPCONFIGPATH=$FABRIC_CFG_PATH/msp \
-    FABRIC_LOGGING_SPEC=DEBUG
+    CORE_LOGGING_LEVEL=DEBUG
 
 # orderer env
 ENV ORDERER_GENERAL_LOCALMSPDIR=$FABRIC_CFG_PATH/msp \
@@ -74,7 +82,8 @@ ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
     FABRIC_CA_CLIENT_HOME=/root/.fabric-ca-client \
     CA_CFG_PATH=/etc/hyperledger/fabric-ca
 
-RUN mkdir -p /var/hyperledger/production \
+RUN mkdir -p /var/hyperledger/db \
+        /var/hyperledger/production \
         $GOPATH/src/github.com/hyperledger \
         $FABRIC_CFG_PATH \
         $FABRIC_CFG_PATH/crypto-config \
@@ -91,13 +100,17 @@ RUN apt-get update \
         && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
         && apt-get install -y python3-pip \
         && apt-get install -y vim tree jq unzip \
-        && pip3 install behave nose docker-compose \
-        && pip3 install pyinotify \
+#&& pip install --upgrade pip==9.0.1 \
+        && pip3 install behave nose docker-compose pyinotify \
         && rm -rf /var/cache/apt
 
-# Install yq to update config for fabric-ca
+# Install yq to update config
 RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 \
-        && chmod a+x /go/bin/yq
+    && chmod a+x /go/bin/yq
+
+# Install chaintool
+RUN curl -fL https://hyperledger.jfrog.io/hyperledger/fabric-maven/org/hyperledger/fabric-chaintool/${CHAINTOOL_RELEASE}/fabric-chaintool-${CHAINTOOL_RELEASE}.jar > /usr/local/bin/chaintool \
+        && chmod a+x /usr/local/bin/chaintool
 
 # install gotools
 RUN go get github.com/golang/protobuf/protoc-gen-go \
@@ -112,42 +125,52 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b release-1.4 --depth 1 https://github.com/hyperledger/fabric.git \
+        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip \
+        && unzip v${PROJECT_VERSION}.zip \
+        && rm v${PROJECT_VERSION}.zip \
+        && mv fabric-${PROJECT_VERSION} fabric \
         && cp $FABRIC_ROOT/devenv/limits.conf /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/cluster/config/configtx.yaml $FABRIC_CFG_PATH/ \
         && cp $FABRIC_ROOT/examples/cluster/config/cryptogen.yaml $FABRIC_CFG_PATH/
 
-# Install configtxgen, cryptogen, configtxlator and discover
+# Install configtxgen, cryptogen and configtxlator
 RUN cd $FABRIC_ROOT/ \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/configtxgen \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/cryptogen \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/common/tools/configtxlator \
-	&& CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${BASE_VERSION}" github.com/hyperledger/fabric/cmd/discover
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "" github.com/hyperledger/fabric/common/tools/configtxgen \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "" github.com/hyperledger/fabric/common/tools/cryptogen \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "" github.com/hyperledger/fabric/common/tools/configtxlator
 
 # Install eventsclient
 RUN cd $FABRIC_ROOT/examples/events/eventsclient \
         && go install \
         && go clean
 
+# Install discover cmd
+RUN CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${BASE_VERSION}" github.com/hyperledger/fabric/cmd/discover
+
 # Install fabric peer
-RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/peer \
+RUN cd $FABRIC_ROOT/peer \
+        && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS" \
         && go clean
 
 # Install fabric orderer
-RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/orderer \
+RUN cd $FABRIC_ROOT/orderer \
+        && CGO_CFLAGS=" " go install -ldflags "$LD_FLAGS" \
         && go clean
 
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-	&& git clone --single-branch -b release-1.4 --depth 1 https://github.com/hyperledger/fabric-ca.git \
-    	# This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-    	&& go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
-    	# Copy example ca and key files
-    	&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
-    	&& go clean
+    && wget https://github.com/hyperledger/fabric-ca/archive/v${HLF_CA_VERSION}.zip \
+    && unzip v${HLF_CA_VERSION}.zip \
+    && rm v${HLF_CA_VERSION}.zip \
+    && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
+    # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
+    && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$HLF_CA_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+    # Copy example ca and key files
+    && cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
+    && go clean
 
 # This is useful to debug local code with mapping inside
 VOLUME $GOPATH/src/github.com/hyperledger
