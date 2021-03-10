@@ -36,7 +36,7 @@ ENV BASE_VERSION=2.3.1
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
 ENV PROJECT_VERSION=2.3.1
-ENV HLF_CA_VERSION=1.4.9
+ENV HLF_CA_VERSION=1.5.0
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger
