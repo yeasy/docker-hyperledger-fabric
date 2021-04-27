@@ -17,7 +17,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/production
 
-FROM golang:1.14
+FROM golang:1.15
 LABEL maintainer "Baohua Yang <yeasy.github.com>"
 
 # Orderer, peer, ca, operation api
@@ -30,11 +30,11 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=2.2.2
+ENV BASE_VERSION=2.2.3
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=2.2.2
-ENV HLF_CA_VERSION=1.4.9
+ENV PROJECT_VERSION=2.2.3
+ENV HLF_CA_VERSION=1.5.0
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger

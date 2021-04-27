@@ -8,14 +8,17 @@ If you want to run fabric instead of dev/compiling, please refer to [hyperledger
 
 * [`latest` (latest/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/Dockerfile): Tracking latest master branch code.
 * [`release-v2.3` (release-v2.3/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/release-v2.3/Dockerfile): Build for the 2.3 release.
+* [`2.3.2` (v2.3.2/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.3.2/Dockerfile): Build for the 2.3.2 release.
 * [`2.3.1` (v2.3.1/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.3.1/Dockerfile): Build for the 2.3.1 release.
 * [`2.3.0` (v2.3.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.3.0/Dockerfile): Build for the 2.3.0 release.
 * [`release-v2.2` (release-v2.2/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/release-v2.2/Dockerfile): Build for the 2.2 LTS release.
+* [`2.2.3` (v2.2.3/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.2.3/Dockerfile): Build for the 2.2.3 release.
 * [`2.2.0` (v2.2.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.2.0/Dockerfile): Build for the 2.2.0 release.
 * [`2.1.0` (v2.1.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.1.0/Dockerfile): Build for the 2.1.0 release.
 * [`release-v2.0` (release-v2.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/release-v2.0/Dockerfile): Build for the 2.0 release.
 * [`2.0.0` (v2.0.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.0.0/Dockerfile): Build for the 2.0.0 release.
 * [`release-v1.4` (release-v1.4/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/release-v1.4/Dockerfile): Build for the 1.4 LTS release.
+* [`1.4.12` (v1.4.12/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.4.12/Dockerfile): Build for the 1.4.12 release.
 * [`1.4.11` (v1.4.11/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.4.11/Dockerfile): Build for the 1.4.11 release.
 * [`1.4.10` (v1.4.10/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.4.10/Dockerfile): Build for the 1.4.10 release.
 * [`1.4.9` (v1.4.9/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v1.4.9/Dockerfile): Build for the 1.4.9 release.
