@@ -7,8 +7,6 @@
 # * cryptogen
 # * configtxgen
 # * configtxlator
-# * idemixgen
-# * osnadmin
 # * gotools
 
 # If you only need quickly deploy a fabric network, please see
@@ -32,15 +30,15 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=2.3.3
+ENV BASE_VERSION=2.2.4
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=2.3.3
-ENV HLF_CA_VERSION=1.5.2
+ENV PROJECT_VERSION=2.2.4
+ENV HLF_CA_VERSION=1.5.0
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger
-ENV TWO_DIGIT_VERSION=2.3
+ENV TWO_DIGIT_VERSION=2.2
 
 ENV BASE_DOCKER_NS=hyperledger
 ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
@@ -94,7 +92,7 @@ RUN apt-get update \
 RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 \
         && chmod a+x /go/bin/yq
 
-# Install gotools
+# install gotools
 RUN go get github.com/golang/protobuf/protoc-gen-go \
         && go get github.com/maxbrunsfeld/counterfeiter \
         && go get github.com/axw/gocov/... \
@@ -107,8 +105,11 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b main --depth 1 https://github.com/hyperledger/fabric.git \
-        && echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
+        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip \
+        && unzip v${PROJECT_VERSION}.zip \
+        && rm v${PROJECT_VERSION}.zip \
+        && mv fabric-${PROJECT_VERSION} fabric \
+	&& echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
         && echo "*                soft    nofile          8192" >> /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
@@ -116,15 +117,13 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
         && go get github.com/hyperledger/fabric-protos-go/peer
 
-# Install configtxgen, cryptogen, configtxlator, discover, idemixgen and osnadmin
+# Install configtxgen, cryptogen, configtxlator, discover and idemixgen
 RUN cd $FABRIC_ROOT/ \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxgen \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/cryptogen \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxlator \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/discover \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/idemixgen \
-        && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/osnadmin
-
+        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxgen \
+        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/cryptogen \
+        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/configtxlator \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "-X github.com/hyperledger/fabric/cmd/discover/metadata.Version=${PROJECT_VERSION}" github.com/hyperledger/fabric/cmd/discover \
+        && CGO_CFLAGS=" " go install -tags "" github.com/hyperledger/fabric/cmd/idemixgen
 
 # Install fabric peer
 RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/peer \
@@ -138,9 +137,12 @@ RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledg
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b main --depth 1 https://github.com/hyperledger/fabric-ca.git \
+        && wget https://github.com/hyperledger/fabric-ca/archive/v${HLF_CA_VERSION}.zip \
+        && unzip v${HLF_CA_VERSION}.zip \
+        && rm v${HLF_CA_VERSION}.zip \
+        && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
 # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=${HLF_CA_VERSION} -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
         && go clean
