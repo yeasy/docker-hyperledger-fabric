@@ -96,12 +96,12 @@ RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/y
 
 # Install gotools
 RUN go get github.com/golang/protobuf/protoc-gen-go \
-        && go get github.com/maxbrunsfeld/counterfeiter \
+        && go get github.com/maxbrunsfeld/counterfeiter/v6 \
         && go get github.com/axw/gocov/... \
         && go get github.com/AlekSi/gocov-xml \
         && go get golang.org/x/tools/cmd/goimports \
         && go get golang.org/x/lint/golint \
-        && go get github.com/estesp/manifest-tool/... \
+#&& go get github.com/estesp/manifest-tool/... \
         && go get github.com/client9/misspell/cmd/misspell \
         && go get github.com/onsi/ginkgo/ginkgo
 
@@ -117,7 +117,7 @@ RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
         && go get github.com/hyperledger/fabric-protos-go/peer
 
 # Install configtxgen, cryptogen, configtxlator, discover, idemixgen and osnadmin
-RUN cd $FABRIC_ROOT/ \
+RUN cd $FABRIC_ROOT \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxgen \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/cryptogen \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxlator \
@@ -127,11 +127,13 @@ RUN cd $FABRIC_ROOT/ \
 
 
 # Install fabric peer
-RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/peer \
+RUN cd $FABRIC_ROOT \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/peer \
         && go clean
 
 # Install fabric orderer
-RUN CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/orderer \
+RUN cd $FABRIC_ROOT \
+        && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/orderer \
         && go clean
 
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
