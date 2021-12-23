@@ -10,7 +10,6 @@
 # * discover
 # * ledgerutil
 # * osnadmin
-# * ccaas_builder sample
 # * gotools
 
 # If you only need quickly deploy a fabric network, please see
@@ -34,10 +33,10 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=2.4.1
+ENV BASE_VERSION=2.4.0
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=2.4.1
+ENV PROJECT_VERSION=2.4.0
 ENV HLF_CA_VERSION=1.5.2
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
@@ -73,7 +72,6 @@ ENV FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server \
 
 RUN mkdir -p /var/hyperledger/production \
         $GOPATH/src/github.com/hyperledger \
-        /opt/hyperledger/ccaas_builder/bin \
         $FABRIC_CFG_PATH/crypto-config \
         /var/hyperledger/fabric-ca-server \
         $FABRIC_CA_SERVER_HOME \
@@ -109,7 +107,10 @@ RUN go get github.com/golang/protobuf/protoc-gen-go \
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b main --depth 1 https://github.com/hyperledger/fabric.git \
+        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip \
+        && unzip v${PROJECT_VERSION}.zip \
+        && rm v${PROJECT_VERSION}.zip \
+        && mv fabric-${PROJECT_VERSION} fabric \
         && echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
         && echo "*                soft    nofile          8192" >> /etc/security/limits.conf \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
@@ -118,7 +119,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
 RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
         && go get github.com/hyperledger/fabric-protos-go/peer
 
-# Install configtxgen, cryptogen, configtxlator, discover, ledgerutil, osnadmin, orderer and peer
+# Install configtxgen, cryptogen, configtxlator, discover, idemixgen, osnadmin, orderer and peer
 RUN cd $FABRIC_ROOT \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxgen \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxlator \
@@ -128,20 +129,16 @@ RUN cd $FABRIC_ROOT \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/osnadmin \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/orderer \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "$LD_FLAGS" github.com/hyperledger/fabric/cmd/peer \
-	&& go clean
-
-# Install ccaas_builder sample, since hlf v2.4.1
-RUN cd $FABRIC_ROOT/ccaas_builder \
-        && go build -o /opt/hyperledger/ccaas_builder/bin/ ./cmd/build \
-        && go build -o /opt/hyperledger/ccaas_builder/bin/ ./cmd/detect \
-        && go build -o /opt/hyperledger/ccaas_builder/bin/ ./cmd/release \
-	&& go clean
+        && go clean
 
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b main --depth 1 https://github.com/hyperledger/fabric-ca.git \
+        && wget https://github.com/hyperledger/fabric-ca/archive/v${HLF_CA_VERSION}.zip \
+        && unzip v${HLF_CA_VERSION}.zip \
+        && rm v${HLF_CA_VERSION}.zip \
+        && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
 # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
         && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=${HLF_CA_VERSION} -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
