@@ -21,7 +21,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/production
 
-FROM golang:1.16
+FROM golang:1.18
 LABEL maintainer "Baohua Yang <yeasy.github.com>"
 
 # Orderer, peer, ca, operation api
@@ -34,11 +34,11 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=2.4.1
+ENV BASE_VERSION=2.4.5
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=2.4.1
-ENV HLF_CA_VERSION=1.5.2
+ENV PROJECT_VERSION=2.4.5
+ENV HLF_CA_VERSION=1.5.5
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger
@@ -97,15 +97,12 @@ RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/y
         && chmod a+x /go/bin/yq
 
 # Install gotools
-RUN go get github.com/golang/protobuf/protoc-gen-go \
-        && go get github.com/maxbrunsfeld/counterfeiter/v6 \
-        && go get github.com/axw/gocov/... \
-        && go get github.com/AlekSi/gocov-xml \
-        && go get golang.org/x/tools/cmd/goimports \
-        && go get golang.org/x/lint/golint \
-#&& go get github.com/estesp/manifest-tool/... \
-        && go get github.com/client9/misspell/cmd/misspell \
-        && go get github.com/onsi/ginkgo/ginkgo
+RUN go install github.com/golang/protobuf/protoc-gen-go@latest \
+        && go install github.com/maxbrunsfeld/counterfeiter/v6@latest \
+        && go install github.com/axw/gocov/gocov@latest \
+        && go install github.com/axw/gocov/gocov@latest \
+        && go install golang.org/x/tools/cmd/goimports@latest \
+        && go install github.com/onsi/ginkgo/ginkgo@latest
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
@@ -115,10 +112,10 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && cp -r $FABRIC_ROOT/sampleconfig/* $FABRIC_CFG_PATH/
 
 # Add external fabric chaincode dependencies
-RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
-        && go get github.com/hyperledger/fabric-protos-go/peer
+#RUN go get github.com/hyperledger/fabric-chaincode-go/shim \
+#        && go get github.com/hyperledger/fabric-protos-go/peer
 
-# Install configtxgen, cryptogen, configtxlator, discover, idemixgen, osnadmin, orderer and peer
+# Install configtxgen, cryptogen, configtxlator, discover, ledgerutil, osnadmin, orderer and peer
 RUN cd $FABRIC_ROOT \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxgen \
         && CGO_CFLAGS=" " go install -tags "" -ldflags "${LD_FLAGS}" github.com/hyperledger/fabric/cmd/configtxlator \
@@ -135,7 +132,7 @@ RUN cd $FABRIC_ROOT/ccaas_builder \
         && go build -o /opt/hyperledger/ccaas_builder/bin/ ./cmd/build \
         && go build -o /opt/hyperledger/ccaas_builder/bin/ ./cmd/detect \
         && go build -o /opt/hyperledger/ccaas_builder/bin/ ./cmd/release \
-
+	&& go clean
 #ADD crypto-config $FABRIC_CFG_PATH/crypto-config
 
 # Install fabric-ca
@@ -145,7 +142,7 @@ RUN cd $GOPATH/src/github.com/hyperledger \
         && rm v${HLF_CA_VERSION}.zip \
         && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
 # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
-        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=$PROJECT_VERSION -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
+        && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=${HLF_CA_VERSION} -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
 #&& cp $FABRIC_CA_ROOT/images/fabric-ca/payload/*.pem $FABRIC_CA_HOME/ \
         && go clean
