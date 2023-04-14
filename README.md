@@ -19,6 +19,7 @@ If you want to run fabric instead of dev/compiling, please refer to [hyperledger
 * [`2.3.1` (v2.3.1/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.3.1/Dockerfile): Build for the 2.3.1 release.
 * [`2.3.0` (v2.3.0/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.3.0/Dockerfile): Build for the 2.3.0 release.
 * [`release-v2.2` (release-v2.2/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/release-v2.2/Dockerfile): Build for the 2.2 LTS release.
+* [`2.2.10` (v2.2.10/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.2.10/Dockerfile): Build for the 2.2.10 release.
 * [`2.2.9` (v2.2.9/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.2.9/Dockerfile): Build for the 2.2.9 release.
 * [`2.2.8` (v2.2.8/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.2.8/Dockerfile): Build for the 2.2.8 release.
 * [`2.2.4` (v2.2.4/Dockerfile)](https://github.com/yeasy/docker-hyperledger-fabric/blob/master/v2.2.4/Dockerfile): Build for the 2.2.4 release.
