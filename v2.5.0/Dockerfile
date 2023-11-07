@@ -42,7 +42,7 @@ ENV HLF_CA_VERSION=1.5.6
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger
-ENV TWO_DIGIT_VERSION=2.4
+ENV TWO_DIGIT_VERSION=2.5
 
 ENV BASE_DOCKER_NS=hyperledger
 ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
