@@ -21,7 +21,7 @@
 # Workdir is set to $GOPATH/src/github.com/hyperledger/fabric
 # Data is stored under /var/hyperledger/production
 
-FROM golang:1.21
+FROM golang:1.26
 LABEL maintainer "Baohua Yang <yeasy.github.com>"
 
 # Orderer, peer, ca, operation api
@@ -34,15 +34,15 @@ ENV FABRIC_ROOT=$GOPATH/src/github.com/hyperledger/fabric \
     FABRIC_CA_ROOT=$GOPATH/src/github.com/hyperledger/fabric-ca
 
 # BASE_VERSION is used in metadata.Version as major version
-ENV BASE_VERSION=3.0.0
+ENV BASE_VERSION=3.1.4
 
 # PROJECT_VERSION is required in core.yaml for fabric-baseos and fabric-ccenv
-ENV PROJECT_VERSION=3.0.0
-ENV HLF_CA_VERSION=1.5.6
+ENV PROJECT_VERSION=3.1.4
+ENV HLF_CA_VERSION=1.5.18
 
 # generic environment (core.yaml) for builder and runtime: e.g., builder: $(DOCKER_NS)/fabric-ccenv:$(TWO_DIGIT_VERSION), golang, java, node
 ENV DOCKER_NS=hyperledger
-ENV TWO_DIGIT_VERSION=3.0
+ENV TWO_DIGIT_VERSION=3.1
 
 ENV BASE_DOCKER_NS=hyperledger
 ENV LD_FLAGS="-X github.com/hyperledger/fabric/common/metadata.Version=${PROJECT_VERSION} \
@@ -84,13 +84,13 @@ RUN mkdir -p /var/hyperledger/production \
 
 # Install development dependencies
 RUN apt-get update \
-        && apt-get install -y apt-utils python3-dev \
-        && apt-get install -y libsnappy-dev zlib1g-dev libbz2-dev libyaml-dev libltdl-dev libtool \
-        && apt-get install -y python3-pip \
-        && apt-get install -y vim tree jq unzip \
-        && pip3 install behave nose docker-compose \
-        && pip3 install pyinotify \
+        && apt-get install -y apt-utils jq libsnappy-dev libbz2-dev libyaml-dev libltdl-dev libtool python3-dev tree vim unzip zlib1g-dev \
+        && apt-get install -y python3-behave python3-nose python3-pip python3-pyinotify \
         && rm -rf /var/cache/apt
+
+# Install docker-compose separately
+RUN curl -L https://github.com/docker/compose/releases/download/1.25.3/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose \
+        && chmod +x /usr/local/bin/docker-compose
 
 # Install yq to update config for fabric-ca
 RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 \
@@ -100,13 +100,15 @@ RUN wget -O /go/bin/yq https://github.com/mikefarah/yq/releases/download/2.4.1/y
 RUN go install github.com/golang/protobuf/protoc-gen-go@latest \
         && go install github.com/maxbrunsfeld/counterfeiter/v6@latest \
         && go install github.com/axw/gocov/gocov@latest \
-        && go install github.com/axw/gocov/gocov@latest \
         && go install golang.org/x/tools/cmd/goimports@latest \
         && go install github.com/onsi/ginkgo/ginkgo@latest
 
 # Clone the Hyperledger Fabric code and cp sample config files
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b main --depth 1 https://github.com/hyperledger/fabric.git \
+        && wget https://github.com/hyperledger/fabric/archive/v${PROJECT_VERSION}.zip \
+        && unzip v${PROJECT_VERSION}.zip \
+        && rm v${PROJECT_VERSION}.zip \
+        && mv fabric-${PROJECT_VERSION} fabric \
         && echo "*                hard    nofile          65536" >> /etc/security/limits.conf \
         && echo "*                soft    nofile          8192" >> /etc/security/limits.conf \
 	&& echo 'hosts: files dns' > /etc/nsswitch.conf \
@@ -139,7 +141,10 @@ RUN cd $FABRIC_ROOT/ccaas_builder \
 
 # Install fabric-ca
 RUN cd $GOPATH/src/github.com/hyperledger \
-        && git clone --single-branch -b main --depth 1 https://github.com/hyperledger/fabric-ca.git \
+        && wget https://github.com/hyperledger/fabric-ca/archive/v${HLF_CA_VERSION}.zip \
+        && unzip v${HLF_CA_VERSION}.zip \
+        && rm v${HLF_CA_VERSION}.zip \
+        && mv fabric-ca-${HLF_CA_VERSION} fabric-ca \
 # This will install fabric-ca-server and fabric-ca-client into $GOPATH/bin/
         && go install -ldflags "-X github.com/hyperledger/fabric-ca/lib/metadata.Version=${HLF_CA_VERSION} -linkmode external -extldflags '-static -lpthread'" github.com/hyperledger/fabric-ca/cmd/... \
 # Copy example ca and key files
